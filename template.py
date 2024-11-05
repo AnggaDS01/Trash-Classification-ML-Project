@@ -6,14 +6,15 @@ logging.basicConfig(level=logging.INFO, format='[%(asctime)s]: %(message)s:')
 
 project_name = "trashnet"
 
-
 list_of_files = [
     "data/.gitkeep",
     f"{project_name}/__init__.py",
     f"{project_name}/components/__init__.py",
     f"{project_name}/components/data_ingestion.py",
+    f"{project_name}/components/data_transformation.py",
     f"{project_name}/components/data_validation.py",
     f"{project_name}/components/model_trainer.py",
+    f"{project_name}/components/model_evaluation.py",
     f"{project_name}/components/model_pusher.py",
     f"{project_name}/configuration/__init__.py",
     f"{project_name}/configuration/s3_operations.py",
@@ -27,8 +28,11 @@ list_of_files = [
     f"{project_name}/logger/__init__.py",
     f"{project_name}/pipeline/__init__.py",
     f"{project_name}/pipeline/training_pipeline.py",
+    f"{project_name}/pipeline/prediction_pipeline.py",
     f"{project_name}/utils/__init__.py",
     f"{project_name}/utils/main_utils.py",
+    f"{project_name}/ml/__init__.py",
+    f"{project_name}/ml/model.py",
     "template/index.html",
     ".dockerignore",
     "app.py",
@@ -37,22 +41,19 @@ list_of_files = [
     "setup.py"
 ]
 
-
 for filepath in list_of_files:
     filepath = Path(filepath)
-
     filedir, filename = os.path.split(filepath)
 
-    if filedir !="":
+    # Buat direktori jika belum ada
+    if filedir:
         os.makedirs(filedir, exist_ok=True)
         logging.info(f"Creating directory: {filedir} for the file {filename}")
 
-    
-    if(not os.path.exists(filename)) or (os.path.getsize(filename) == 0):
+    # Cek jika file belum ada, baru buat file kosong
+    if not filepath.exists():
         with open(filepath, 'w') as f:
             pass
-            logging.info(f"Creating empty file: {filename}")
-
-    
+        logging.info(f"Creating empty file: {filepath}")
     else:
-        logging.info(f"{filename} is already created")
+        logging.info(f"File {filepath} already exists and will not be overwritten.")
