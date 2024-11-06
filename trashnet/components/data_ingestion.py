@@ -1,12 +1,15 @@
 import sys, os, zipfile, inspect, requests
 from tqdm import tqdm
 from pathlib import Path
+from colorama import init, Fore, Back, Style
+from trashnet.constant.training_pipeline import *
 from trashnet.exception import TrashClassificationException
 from trashnet.entity.config_entity import DataIngestionConfig
 from trashnet.entity.artifacts_entity import DataIngestionArtifact
 from trashnet.utils.main_utils import (display_log_message, 
                                        display_function_name,
-                                       color_text)
+                                       color_text,
+                                       paths_exist)
 
 class DataIngestion:
     def __init__(
@@ -26,7 +29,7 @@ class DataIngestion:
         filename: str="dataset.zip", 
         chunk_size: int=1024, 
         is_file_removed: bool=True
-    ):
+    ) -> None:
         """
         Downloads a zip file from a URL and extracts it to the specified directory only if there is no extract result yet.
         Args:
@@ -46,11 +49,6 @@ class DataIngestion:
 
         # Path file zip yang akan disimpan
         zipfile_path = os.path.join(save_dir_path, filename)
-
-        # Pengecekan apakah direktori ekstrak sudah berisi file
-        if os.listdir(extract_dir_path):  
-            display_log_message("The file has been extracted before. No further action.", is_log=False)
-            return extract_dir_path # Keluar dari fungsi jika file sudah diekstrak
 
         # Jika belum ada hasil ekstrak, lanjutkan unduhan
         try:
@@ -83,7 +81,7 @@ class DataIngestion:
                 os.remove(zipfile_path)
                 display_log_message("Downloaded zip file removed.", is_log=False)
 
-            return extract_dir_path
+            return
 
         except requests.exceptions.RequestException as e:
             raise Exception(f"Error downloading the file: {e}")
@@ -98,22 +96,41 @@ class DataIngestion:
         function_name, file_name_function = display_function_name(inspect.currentframe())
         display_log_message(f"Entered {color_text(function_name)} method of {color_text('DataIngestion')} class in {color_text(file_name_function)}")
         try: 
+            required_files = [
+                 self.data_ingestion_config.data_ingestion_dir_path
+            ]
+            
+            if paths_exist(required_files):
+                display_log_message("All required files and folders are present. Skipping the process.")
+                data_ingestion_artifact = DataIngestionArtifact(
+                    data_ingestion_dir_path = self.data_ingestion_config.data_ingestion_dir_path
+                )
+                
+                display_log_message(f"Exited {color_text(function_name)} method of {color_text('DataIngestion')} class in {color_text(file_name_function)}")
+                display_log_message(f"Data ingestion artifact: {color_text(data_ingestion_artifact)}")
 
-            feature_store_dir_path = self.download_and_extract_zip(
-                url=self.data_ingestion_config.data_download_url,
-                save_dir_path=self.data_ingestion_config.data_ingestion_dir_path,
-                extract_dir_path=self.data_ingestion_config.data_ingestion_dir_path,
-                is_file_removed=True
-            )
+                return data_ingestion_artifact
+            
+            else:
+                display_log_message(f"Getting the data from URL: {color_text(DATA_DOWNLOAD_URL, color=Fore.GREEN)}")
 
-            data_ingestion_artifact = DataIngestionArtifact(
-                data_ingestion_dir_path = feature_store_dir_path
-            )
+                self.download_and_extract_zip(
+                    url=self.data_ingestion_config.data_download_url,
+                    save_dir_path=self.data_ingestion_config.data_ingestion_dir_path,
+                    extract_dir_path=self.data_ingestion_config.data_ingestion_dir_path,
+                    is_file_removed=True
+                )
 
-            display_log_message(f"Exited {color_text(function_name)} method of {color_text('DataIngestion')} class in {color_text(file_name_function)}")
-            display_log_message(f"Data ingestion artifact: {color_text(data_ingestion_artifact)}")
+                display_log_message(f"Got the data from URL: {color_text(DATA_DOWNLOAD_URL, color=Fore.GREEN)}")
 
-            return data_ingestion_artifact
+                data_ingestion_artifact = DataIngestionArtifact(
+                    data_ingestion_dir_path = self.data_ingestion_config.data_ingestion_dir_path
+                )
+
+                display_log_message(f"Exited {color_text(function_name)} method of {color_text('DataIngestion')} class in {color_text(file_name_function)}")
+                display_log_message(f"Data ingestion artifact: {color_text(data_ingestion_artifact)}")
+
+                return data_ingestion_artifact
 
         except Exception as e:
             raise TrashClassificationException(e, sys)

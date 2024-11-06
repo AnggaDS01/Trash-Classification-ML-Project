@@ -17,14 +17,14 @@ from trashnet.exception import TrashClassificationException
 from trashnet.entity.config_entity import DataTransformationConfig
 from trashnet.entity.artifacts_entity import (
                                         DataIngestionArtifact, 
-                                        DataTransformationArtifact
-                                    )
+                                        DataTransformationArtifact)
 
 from trashnet.utils.main_utils import (display_log_message, 
                                        display_function_name,
                                        color_text,
                                        custom_title_print,
                                        save_object,
+                                       paths_exist,
                                        DataInspector)
 
 from trashnet.constant.training_pipeline import *
@@ -280,119 +280,143 @@ class DataTransformation:
     def initiate_data_transformation(self)-> DataTransformationArtifact:
         function_name, file_name_function = display_function_name(inspect.currentframe())
         display_log_message(f"Entered {color_text(function_name)} method of {color_text('DataTransformation')} class in {color_text(file_name_function)}")
+
         try: 
-            display_log_message(f"Collecting images from {color_text(self.data_ingestion_artifacts.data_ingestion_dir_path / DATA_TRAIN_DIR)}")
-            all_images_paths = self.collect_and_combine_images(
-                classes = LABEL_LIST,
-                train_path  = self.data_ingestion_artifacts.data_ingestion_dir_path / DATA_TRAIN_DIR,
-                pattern_regex = PATTERN_IMAGE_EXT_REGEX,
-            )
 
-            display_log_message(f"Converting image paths to tf dataset")
-            tf_paths = tf.data.Dataset.list_files(all_images_paths, shuffle=False)
-            display_log_message(f'data: {color_text(tf_paths)}')
-            display_log_message(f'number of data: {color_text(tf_paths.cardinality())}')
+            required_files = [
+                self.data_transformation_config.train_tfrecord_data_path,
+                self.data_transformation_config.valid_tfrecord_data_path,
+                self.data_transformation_config.label_list_path,
+                self.data_transformation_config.class_weights_path
+            ]
 
-            display_log_message(f"Showing train files path info")
-            file_info  = FilePathInfo(unit_file_size='KB')
-            label_index = file_info.show_train_files_path_info(tf_paths, is_random=True)
+            if paths_exist(required_files):
+                display_log_message("All required files and folders are present. Skipping the process.")
+                data_transformation_artifact = DataTransformationArtifact(
+                    train_tfrecord_data_path = self.data_transformation_config.train_tfrecord_data_path,
+                    valid_tfrecord_data_path = self.data_transformation_config.valid_tfrecord_data_path,
+                    label_list_path = self.data_transformation_config.label_list_path,
+                    class_weights_path = self.data_transformation_config.class_weights_path,
+                )
 
-            display_log_message("Splitting train and validation data")
-            splitter = DatasetSplitter()
-            train_tf_paths, valid_tf_paths = splitter.split_train_valid_test(
-                dataset=tf_paths,
-                split_ratio=SPLIT_RATIO,
-                shuffle=True,
-                seed=12
-            )
+                display_log_message(f"Exited {color_text(function_name)} method of {color_text('DataTransformation')} class in {color_text(file_name_function)}")
+                display_log_message(f"Data transformation artifact: {color_text(data_transformation_artifact)}")
 
-            display_log_message(f"Showing class distribution")
-            train_class_distribution, class_weights = self.calculate_class_distribution_tf(train_tf_paths, LABEL_LIST)
-            valid_class_distribution, _ = self.calculate_class_distribution_tf(valid_tf_paths, LABEL_LIST)
+                return data_transformation_artifact
+            
+            else:
+                display_log_message("One or more required files/folders are missing. Running the process...")
+                display_log_message(f"Collecting images from {color_text(self.data_ingestion_artifacts.data_ingestion_dir_path / DATA_TRAIN_DIR)}")
+                all_images_paths = self.collect_and_combine_images(
+                    classes = LABEL_LIST,
+                    train_path  = self.data_ingestion_artifacts.data_ingestion_dir_path / DATA_TRAIN_DIR,
+                    pattern_regex = PATTERN_IMAGE_EXT_REGEX,
+                )
 
-            custom_title_print("Class distribution on Train set:")
-            self.print_class_distribution(train_class_distribution)
-            print()
+                display_log_message(f"Converting image paths to tf dataset")
+                tf_paths = tf.data.Dataset.list_files(all_images_paths, shuffle=False)
+                display_log_message(f'data: {color_text(tf_paths)}')
+                display_log_message(f'number of data: {color_text(tf_paths.cardinality())}')
 
-            custom_title_print("Class distribution in Validation set:")
-            self.print_class_distribution(valid_class_distribution)
-            print()
+                display_log_message(f"Showing train files path info")
+                file_info  = FilePathInfo(unit_file_size='KB')
+                label_index = file_info.show_train_files_path_info(tf_paths, is_random=True)
 
-            display_log_message(f"creating label list table")
-            label_table = self.create_label_list_table(LABEL_LIST, default_value=-1)
+                display_log_message("Splitting train and validation data")
+                splitter = DatasetSplitter()
+                train_tf_paths, valid_tf_paths = splitter.split_train_valid_test(
+                    dataset=tf_paths,
+                    split_ratio=SPLIT_RATIO,
+                    shuffle=True,
+                    seed=12
+                )
 
-            inspector = DataInspector(
-                LABEL_LIST,
-                figsize=(12,6)
-            )
+                display_log_message(f"Showing class distribution")
+                train_class_distribution, class_weights = self.calculate_class_distribution_tf(train_tf_paths, LABEL_LIST)
+                valid_class_distribution, _ = self.calculate_class_distribution_tf(valid_tf_paths, LABEL_LIST)
 
-            preprocessor = ImagePreprocessor(
-                label_index=label_index,
-                label_encoding=label_table,
-                target_size=IMAGE_SIZE
-            )
+                custom_title_print("Class distribution on Train set:")
+                self.print_class_distribution(train_class_distribution)
+                print()
 
-            display_log_message(f"Converting images to tf dataset...")
-            train_tf_images, valid_tf_images = preprocessor.convert_path_to_image(
-                train_data=train_tf_paths,
-                valid_data=valid_tf_paths,
-            )
+                custom_title_print("Class distribution in Validation set:")
+                self.print_class_distribution(valid_class_distribution)
+                print()
 
-            display_log_message(f"Resizing images...")
-            train_tf_images_resized, valid_tf_images_resized = preprocessor.image_resizing(
-                train_data=train_tf_images,
-                valid_data=valid_tf_images,
-            )
+                display_log_message(f"creating label list table")
+                label_table = self.create_label_list_table(LABEL_LIST, default_value=-1)
 
-            display_log_message(f"Normalizing images...")
-            train_tf_images_normalized, valid_tf_images_normalized = preprocessor.image_normalization(
-                train_data=train_tf_images_resized,
-                valid_data=valid_tf_images_resized,
-            )
+                inspector = DataInspector(
+                    LABEL_LIST,
+                    figsize=(12,6)
+                )
 
-            display_log_message(f"Augmenting images...")
-            train_tf_images_augmented, valid_tf_images_augmented = preprocessor.image_augmentation(
-                train_data=train_tf_images_normalized,
-                valid_data=valid_tf_images_normalized
-            )
+                preprocessor = ImagePreprocessor(
+                    label_index=label_index,
+                    label_encoding=label_table,
+                    target_size=IMAGE_SIZE
+                )
 
-            display_log_message(f"Inspecting data...")
-            inspector.inspect(
-                train_dataset=train_tf_images_augmented,
-                valid_dataset=valid_tf_images_augmented
-            )
+                display_log_message(f"Converting images to tf dataset...")
+                train_tf_images, valid_tf_images = preprocessor.convert_path_to_image(
+                    train_data=train_tf_paths,
+                    valid_data=valid_tf_paths,
+                )
 
-            train_tf_images_augmented = train_tf_images_augmented.cache()
-            valid_tf_images_augmented = valid_tf_images_augmented.cache()
+                display_log_message(f"Resizing images...")
+                train_tf_images_resized, valid_tf_images_resized = preprocessor.image_resizing(
+                    train_data=train_tf_images,
+                    valid_data=valid_tf_images,
+                )
 
-            display_log_message(f"Saving train to {color_text(self.data_transformation_config.train_tfrecord_data_path)}...\n and validation dataset to {color_text(self.data_transformation_config.valid_tfrecord_data_path)}...")
-            train_tf_images_augmented.save(str(self.data_transformation_config.train_tfrecord_data_path), compression="GZIP")
-            valid_tf_images_augmented.save(str(self.data_transformation_config.valid_tfrecord_data_path), compression="GZIP")
+                display_log_message(f"Normalizing images...")
+                train_tf_images_normalized, valid_tf_images_normalized = preprocessor.image_normalization(
+                    train_data=train_tf_images_resized,
+                    valid_data=valid_tf_images_resized,
+                )
 
-            display_log_message(f"Saving class weights to {color_text(self.data_transformation_config.class_weights_path)}...")
-            save_object(
-                file_path=self.data_transformation_config.class_weights_path,
-                obj=class_weights
-            )
+                display_log_message(f"Augmenting images...")
+                train_tf_images_augmented, valid_tf_images_augmented = preprocessor.image_augmentation(
+                    train_data=train_tf_images_normalized,
+                    valid_data=valid_tf_images_normalized
+                )
 
-            display_log_message(f"Saving label list to {color_text(self.data_transformation_config.label_list_path)}...")
-            save_object(
-                file_path=self.data_transformation_config.label_list_path,
-                obj=LABEL_LIST
-            )
+                display_log_message(f"Inspecting data...")
+                inspector.inspect(
+                    train_dataset=train_tf_images_augmented,
+                    valid_dataset=valid_tf_images_augmented
+                )
 
-            data_transformation_artifact = DataTransformationArtifact(
-                train_tfrecord_data_path = self.data_transformation_config.train_tfrecord_data_path,
-                valid_tfrecord_data_path = self.data_transformation_config.valid_tfrecord_data_path,
-                label_list_path = self.data_transformation_config.label_list_path,
-                class_weights_path = self.data_transformation_config.class_weights_path,
-            )
+                train_tf_images_augmented = train_tf_images_augmented.cache()
+                valid_tf_images_augmented = valid_tf_images_augmented.cache()
 
-            display_log_message(f"Exited {color_text(function_name)} method of {color_text('DataTransformation')} class in {color_text(file_name_function)}")
-            display_log_message(f"Data transformation artifact: {color_text(data_transformation_artifact)}")
+                display_log_message(f"Saving train to {color_text(self.data_transformation_config.train_tfrecord_data_path)}...\n and validation dataset to {color_text(self.data_transformation_config.valid_tfrecord_data_path)}...")
+                train_tf_images_augmented.save(str(self.data_transformation_config.train_tfrecord_data_path), compression="GZIP")
+                valid_tf_images_augmented.save(str(self.data_transformation_config.valid_tfrecord_data_path), compression="GZIP")
 
-            return data_transformation_artifact
+                display_log_message(f"Saving class weights to {color_text(self.data_transformation_config.class_weights_path)}...")
+                save_object(
+                    file_path=self.data_transformation_config.class_weights_path,
+                    obj=class_weights
+                )
 
+                display_log_message(f"Saving label list to {color_text(self.data_transformation_config.label_list_path)}...")
+                save_object(
+                    file_path=self.data_transformation_config.label_list_path,
+                    obj=LABEL_LIST
+                )
+
+                data_transformation_artifact = DataTransformationArtifact(
+                    train_tfrecord_data_path = self.data_transformation_config.train_tfrecord_data_path,
+                    valid_tfrecord_data_path = self.data_transformation_config.valid_tfrecord_data_path,
+                    label_list_path = self.data_transformation_config.label_list_path,
+                    class_weights_path = self.data_transformation_config.class_weights_path,
+                )
+
+                display_log_message(f"Exited {color_text(function_name)} method of {color_text('DataTransformation')} class in {color_text(file_name_function)}")
+                display_log_message(f"Data transformation artifact: {color_text(data_transformation_artifact)}")
+
+                return data_transformation_artifact
         except Exception as e:
             raise TrashClassificationException(e, sys)
 

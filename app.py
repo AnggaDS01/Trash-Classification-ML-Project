@@ -2,6 +2,7 @@ import sys
 from trashnet.pipeline.training_pipeline import TrainPipeline
 from trashnet.exception import TrashClassificationException
 
+
 if __name__ == "__main__":
     try:
 

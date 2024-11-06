@@ -11,3 +11,7 @@ class DataTransformationArtifact:
     valid_tfrecord_data_path: Path
     label_list_path: Path
     class_weights_path: Path
+
+@dataclass
+class ModelTrainerArtifact:
+    model_path: Path

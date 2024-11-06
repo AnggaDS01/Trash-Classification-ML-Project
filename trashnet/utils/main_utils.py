@@ -107,6 +107,33 @@ def save_object(file_path, obj):
     except Exception as e:
         raise TrashClassificationException(e, sys)
     
+def load_object(file_path):
+    """
+    Fungsi untuk memuat objek dari file dengan menggunakan modul `dill`.
+
+    Args:
+        file_path (str): Lokasi file dari objek yang ingin dimuat.
+
+    Returns:
+        object: Objek yang dimuat dari file.
+    """
+
+    try:
+        with open(file_path, 'rb') as file_obj:
+            return dill.load(file_obj)
+    except FileNotFoundError:
+        print(f"File not found: {file_path}")
+        return None
+
+# Fungsi untuk mengecek keberadaan file
+def paths_exist(paths):
+    missing_paths = [path for path in paths if not os.path.exists(path)]
+    
+    if missing_paths:
+        for path in missing_paths:
+            logging.info(f"{path} not found.")
+        return False
+    return True
 
 class DataInspector:
     """
@@ -179,3 +206,4 @@ class DataInspector:
         # Looping dinamis sesuai dataset yang diberikan (train, valid, test)
         for ds_name, ds in datasets.items():
             self._inspect_single_dataset(ds, ds_name, ispath, idx)
+
