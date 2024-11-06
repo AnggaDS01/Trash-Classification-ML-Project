@@ -1,17 +1,12 @@
-from trashnet.logger import logging
-from trashnet.exception import TrashClassificationException
 import sys
-
-def test_logging():
-    logging.info("Test logging")
-
-def test_exception():
-    try:
-        a = 1/0
-    except Exception as e:
-        raise TrashClassificationException(e, sys)
-    
+from trashnet.pipeline.training_pipeline import TrainPipeline
+from trashnet.exception import TrashClassificationException
 
 if __name__ == "__main__":
-    test_logging()
-    test_exception()
+    try:
+
+        training_pipeline = TrainPipeline()
+        training_pipeline.run_pipeline()
+
+    except Exception as e:
+        raise TrashClassificationException(e, sys)
