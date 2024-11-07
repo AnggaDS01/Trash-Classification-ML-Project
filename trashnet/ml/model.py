@@ -1,12 +1,5 @@
 import tensorflow as tf
 
-from trashnet.constant.training_pipeline import *
-
-base_model = tf.keras.applications.DenseNet121(
-    weights='imagenet',  # Menggunakan bobot dari pretrained model di ImageNet
-    include_top=False,   # Tidak menyertakan lapisan fully connected atas agar bisa menyesuaikan dataset kita
-    input_shape=(*IMAGE_SIZE, 3)  # Menyesuaikan input shape dengan ukuran gambar kita
-)
 
 def build_model(
       input_shape=None,

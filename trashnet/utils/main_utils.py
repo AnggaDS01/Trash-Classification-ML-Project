@@ -43,6 +43,26 @@ def remove_color_codes(text):
     ansi_escape = re.compile(r'\x1b\[[0-9;]*m')
     return ansi_escape.sub('', text)
 
+def show_data_info(**datasets):
+    """
+    Menampilkan informasi detail tentang dataset yang diberikan.
+
+    Args:
+        **datasets: Satu atau lebih dataset yang ingin ditampilkan informasi.
+    """
+
+    try:
+        for dataset_name, dataset in datasets.items():
+            custom_title_print(f"{dataset_name} info")
+            print(f'info {dataset_name}: {dataset}')
+            print(f'number of {dataset_name}: {len(dataset)}')
+            print()
+    except Exception as e:
+        print(f'''
+            explicitly input parameter names such as:
+            show_data_info(train_dataset=train_ds, valid_dataset=valid_ds)
+        ''')
+
 def display_log_message(msg, is_log=True):
     print(f"{color_text('[INFO]', color=Fore.GREEN)} {msg}")
     if is_log:
@@ -167,16 +187,14 @@ class DataInspector:
     gambar dalam dataset pelatihan, validasi, dan pengujian.
     """
 
-    def __init__(self, label_encoding, figsize):
+    def __init__(self, label_encoding):
         """
         Inisialisasi kelas `DataInspector`.
 
         Args:
             label_encoding (dict): Mapping dari label numerik ke label kelas.
-            figsize (tuple): Ukuran figure untuk plot visualisasi gambar.
         """
         self.label_encoding = label_encoding
-        self.figsize = figsize
 
     def _inspect_single_dataset(self, dataset, ds_name, ispath, idx):
         """

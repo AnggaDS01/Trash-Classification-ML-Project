@@ -3,7 +3,10 @@ import os
 from trashnet.constant import *
 from pathlib import Path
 from trashnet.utils.main_utils import read_yaml
-from trashnet.entity.config_entity import (DataIngestionConfig, DataTransformationConfig)
+from trashnet.entity.config_entity import (DataIngestionConfig,
+                                           DataTransformationConfig,
+                                           ModelTrainerConfig,
+                                           WandbConfig)
 
 
 class ConfigurationManager:
@@ -27,6 +30,9 @@ class ConfigurationManager:
         self.training_params = self.params.TRAINING
         self.wandb_params = self.params.WANDB
     
+
+
+
     def get_data_ingestion_config(self) -> DataIngestionConfig:
         data_ingestion_dir_path = Path(os.path.join(self.directories_config.ARTIFACTS, self.directories_config.DATA_INGESTION))
         train_dir_path = data_ingestion_dir_path / self.data_config.TRAIN_DIR
@@ -74,16 +80,80 @@ class ConfigurationManager:
 
         return data_transformation_config
 
-if __name__ == '__main__':
-    config = ConfigurationManager()
-    data_ingestion_config = config.get_data_transformation_config()
-#     print(data_ingestion_config.data_transformation_dir_path)
-#     print(data_ingestion_config.train_tfrecord_data_path)
-#     print(data_ingestion_config.valid_tfrecord_data_path)
-#     print(data_ingestion_config.object_dir_path)
-#     print(data_ingestion_config.label_list_path)
-#     print(data_ingestion_config.class_weights_path)
-#     print(data_ingestion_config.img_ext_regex_pattern)
-#     print(data_ingestion_config.label_list)
-#     print(data_ingestion_config.split_ratio)
-    print(data_ingestion_config.img_size)
+
+
+    def get_model_trainer_config(self) -> ModelTrainerConfig:
+        model_dir_path =  Path(os.path.join(self.directories_config.ARTIFACTS, self.directories_config.MODELS))
+        model_path = model_dir_path / (self.model_params.NAME + self.model_config.KERAS_FILE)
+
+        report_dir_path = Path(os.path.join(self.directories_config.ARTIFACTS, self.directories_config.REPORTS))
+        tabel_training_path = report_dir_path / self.model_params.NAME / self.reports_config.TRAINING_TABEL
+        tabel_epoch_path = report_dir_path / self.model_params.NAME / self.reports_config.EPOCH_TABEL
+        plot_training_path = report_dir_path / self.model_params.NAME / self.reports_config.TRAINING_PLOT
+        plot_confusion_matrix_path = report_dir_path / self.model_params.NAME / self.reports_config.CONFUSION_MATRIX_PLOT
+        classification_report_path = report_dir_path / self.model_params.NAME / self.reports_config.CLASSIFICATION_REPORT
+
+        batch_size =  self.training_params.BATCH_SIZE
+        epochs =  self.training_params.EPOCHS
+        learning_rate = self.training_params.LEARNING_RATE
+        loss_function = self.training_params.LOSS_FUNCTION
+        metrics = self.training_params.METRICS
+
+
+        model_trainer_config = ModelTrainerConfig(
+            model_dir_path = model_dir_path,
+            model_path = model_path,
+            report_dir_path = report_dir_path,
+            tabel_training_path = tabel_training_path,
+            tabel_epoch_path = tabel_epoch_path,
+            plot_training_path = plot_training_path,
+            plot_confusion_matrix_path = plot_confusion_matrix_path,
+            classification_report_path = classification_report_path,
+            batch_size = batch_size,
+            epochs = epochs,
+            learning_rate = learning_rate,
+            loss_function = loss_function,
+            metrics = metrics
+        )
+
+        return model_trainer_config
+
+
+
+
+    def get_wandb_config(self) -> WandbConfig:
+        config = {
+            "learning_rate": self.training_params.LEARNING_RATE,
+            "loss_function": self.training_params.LOSS_FUNCTION,
+            "metrics": self.training_params.METRICS,
+            "batch_size": self.training_params.BATCH_SIZE,
+            "epochs": self.training_params.EPOCHS,
+            "architecture": self.model_params.NAME,
+            "dataset": self.dataset_params.NAME
+        }
+
+        project = self.wandb_params.PROJECT_NAME
+        
+        wandb_config = WandbConfig(
+            config = config,
+            project = project
+        )
+
+        return wandb_config
+
+# if __name__ == '__main__':
+#     config = ConfigurationManager()
+#     get_config = config.get_model_trainer_config()
+#     print(get_config.model_dir_path)
+#     print(get_config.model_path)
+#     print(get_config.report_dir_path)
+#     print(get_config.tabel_training_path)
+#     print(get_config.tabel_epoch_path)
+#     print(get_config.plot_training_path)
+#     print(get_config.plot_confusion_matrix_path)
+#     print(get_config.classification_report_path)
+#     print(get_config.batch_size)
+#     print(get_config.epochs)
+#     print(get_config.learning_rate)
+#     print(get_config.loss_function)
+#     print(get_config.metrics)

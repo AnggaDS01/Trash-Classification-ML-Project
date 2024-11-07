@@ -12,6 +12,7 @@ from trashnet.utils.main_utils import (display_log_message,
                                        custom_title_print,
                                        save_object,
                                        paths_exist,
+                                       show_data_info,
                                        DataInspector)
 
 
@@ -93,10 +94,7 @@ class DataTransformation:
                 display_log_message(f"creating label list table")
                 label_table = create_label_list_table(self.data_transformation_config.label_list, default_value=-1)
 
-                inspector = DataInspector(
-                    self.data_transformation_config.label_list,
-                    figsize=(12,6)
-                )
+                inspector = DataInspector(self.data_transformation_config.label_list)
 
                 preprocessor = ImagePreprocessor(
                     label_index=label_index,
@@ -127,6 +125,12 @@ class DataTransformation:
                     train_data=train_tf_images_normalized,
                     valid_data=valid_tf_images_normalized
                 )
+
+                display_log_message(f"Showing data info...")
+                show_data_info(
+                        train_dataset=train_tf_images,
+                        valid_dataset=valid_tf_images,
+                    )
 
                 display_log_message(f"Inspecting data...")
                 inspector.inspect(

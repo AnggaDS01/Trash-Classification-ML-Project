@@ -29,8 +29,8 @@ OBJECTS:
 
 # Training & Report Files
 REPORTS:
-  TRAINING_TABLE: "tabel_pelatihan.csv"
-  EPOCH_TABLE: "tabel_epoch.csv"
+  TRAINING_TABEL: "tabel_pelatihan.csv"
+  EPOCH_TABEL: "tabel_epoch.csv"
   TRAINING_PLOT: "plot_pelatihan.png"
   CONFUSION_MATRIX_PLOT: "plot_confusion_matrix.png"
   CLASSIFICATION_REPORT: "classification_report.txt"
