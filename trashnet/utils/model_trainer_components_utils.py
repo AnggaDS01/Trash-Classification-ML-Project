@@ -1,11 +1,14 @@
-import re
 import tensorflow as tf
 import numpy as np
+import seaborn as sns
+import re
 import os
 import csv
 import matplotlib.pyplot as plt
 import wandb
 
+from tqdm import tqdm
+from sklearn.metrics import confusion_matrix, classification_report
 from trashnet.utils.main_utils import custom_title_print
 
 def display_info_dataset_batched(batch_size, dataset, dataset_batched, kind):
@@ -69,6 +72,40 @@ def wandb_logger_callback(validation_data, label_list):
     )
     return wandb_logger  
 
+def plot_training_history(history, save_path):
+    """
+    Plot training and validation accuracy and loss curves.
+
+    Args:
+    - history: History object yang dikembalikan oleh model.fit()
+    - save_path (str): Path di mana gambar kurva akan disimpan.
+    """
+    acc = history.history['accuracy']
+    val_acc = history.history['val_accuracy']
+    loss = history.history['loss']
+    val_loss = history.history['val_loss']
+    epochs = range(len(acc))
+
+    # Plot akurasi
+    plt.figure(figsize=(14, 5))
+    plt.subplot(1, 2, 1)
+    plt.plot(epochs, acc, label='Training Accuracy')
+    plt.plot(epochs, val_acc, label='Validation Accuracy')
+    plt.title('Training and Validation Accuracy')
+    plt.legend()
+
+    # Plot loss
+    plt.subplot(1, 2, 2)
+    plt.plot(epochs, loss, label='Training Loss')
+    plt.plot(epochs, val_loss, label='Validation Loss')
+    plt.title('Training and Validation Loss')
+    plt.legend()
+
+    # Buat direktori jika belum ada, lalu simpan plot
+    dir_path = os.path.dirname(save_path)
+    os.makedirs(dir_path, exist_ok=True)
+    plt.savefig(save_path)
+
 
 class TrainingLogger(tf.keras.callbacks.Callback):
     """
@@ -112,14 +149,6 @@ class TrainingLogger(tf.keras.callbacks.Callback):
 # Callback untuk logging gambar prediksi
 class WandbImageLogger(tf.keras.callbacks.Callback):
     def __init__(self, validation_data, label_list, sample_count=5):
-        """
-        Inisialisasi callback untuk log gambar acak pada setiap akhir epoch di wandb.
-
-        Args:
-            validation_data: Dataset validasi yang berisi gambar dan label.
-            label_list: Daftar label untuk pengelompokan label numerik menjadi label string.
-            sample_count: Jumlah sampel acak yang akan dilog ke wandb.
-        """
         super().__init__()
         self.validation_data = validation_data
         self.label_list = label_list
@@ -129,10 +158,9 @@ class WandbImageLogger(tf.keras.callbacks.Callback):
         # Ambil batch pertama dari data validasi
         images, labels = next(iter(self.validation_data))
 
-        # Pilih sampel secara acak untuk logging
-        indices = np.random.choice(len(images), size=self.sample_count, replace=False)
-        sample_images = images[indices]
-        sample_labels = labels[indices]
+        # Ambil sejumlah sampel prediksi untuk logging
+        sample_images = images[:self.sample_count]
+        sample_labels = labels[:self.sample_count]
         predictions = self.model.predict(sample_images)
 
         wandb_images = []

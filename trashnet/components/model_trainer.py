@@ -1,6 +1,7 @@
+import tensorflow as tf
+import pandas as pd
 import sys
 import inspect 
-import tensorflow as tf
 import wandb
 
 from wandb.integration.keras import WandbMetricsLogger
@@ -119,7 +120,7 @@ class ModelTrainer:
 
                 display_log_message(f"Training model...")
                 training_logger = training_logger_callback(
-                    log_file=self.model_trainer_config.tabel_training_path,
+                    log_file=self.model_trainer_config.training_tabel_path,
                     batch_size=config.batch_size,
                 )
                 plateau = plateau_callback()
@@ -148,6 +149,26 @@ class ModelTrainer:
                 )
 
                 wandb.finish()
+
+                display_log_message(f"Saving tabel epoch to {color_text(self.model_trainer_config.tabel_epoch_path)}")
+                history_df = pd.DataFrame(history.history).reset_index()
+                history_df.rename(columns={'index': 'epoch'}, inplace=True)
+                history_df['epoch'] = history_df['epoch'] + 1
+                history_df = history_df.round({
+                    'accuracy': 4,
+                    'loss': 4,
+                    'val_accuracy': 4,
+                    'val_loss': 4,
+                    'learning_rate': 10
+                    }
+                )
+
+                tabel_epoch_dir_path = os.path.dirname(self.model_trainer_config.tabel_epoch_path)
+                os.makedirs(tabel_epoch_dir_path, exist_ok=True)
+                history_df.to_csv(self.model_trainer_config.tabel_epoch_path, index=False)
+
+                display_log_message(f"Saveing plot training history")
+                plot_training_history(history, self.model_trainer_config.plot_training_path)
 
                 display_log_message(f"Exited {color_text(function_name)} method of {color_text('ModelTrainer')} class in {color_text(file_name_function)}")
                 display_log_message(f"Model trainer config: {color_text(self.model_trainer_config)}")

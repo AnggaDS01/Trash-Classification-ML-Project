@@ -11,8 +11,9 @@ DATASET:
 
 # Training Parameters
 TRAINING:
+  SEED: 42
   BATCH_SIZE: 32
-  EPOCHS: 5
+  EPOCHS: 3
   LEARNING_RATE: 0.001
   LOSS_FUNCTION: sparse_categorical_crossentropy
   METRICS: ['accuracy']

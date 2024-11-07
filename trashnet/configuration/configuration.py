@@ -6,6 +6,7 @@ from trashnet.utils.main_utils import read_yaml
 from trashnet.entity.config_entity import (DataIngestionConfig,
                                            DataTransformationConfig,
                                            ModelTrainerConfig,
+                                           ModelEvaluationConfig,
                                            WandbConfig)
 
 
@@ -64,6 +65,7 @@ class ConfigurationManager:
         label_list = self.dataset_params.LABEL_LIST
         split_ratio = self.dataset_params.SPLIT_RATIO
         img_size = self.model_params.IMAGE_SIZE
+        seed = self.training_params.SEED
 
         data_transformation_config = DataTransformationConfig(
             data_transformation_dir_path = data_transformation_dir_path,
@@ -75,7 +77,8 @@ class ConfigurationManager:
             img_ext_regex_pattern = img_ext_regex_pattern,
             label_list = label_list,
             split_ratio = split_ratio,
-            img_size = img_size
+            img_size = img_size,
+            seed = seed
         )
 
         return data_transformation_config
@@ -87,11 +90,9 @@ class ConfigurationManager:
         model_path = model_dir_path / (self.model_params.NAME + self.model_config.KERAS_FILE)
 
         report_dir_path = Path(os.path.join(self.directories_config.ARTIFACTS, self.directories_config.REPORTS))
-        tabel_training_path = report_dir_path / self.model_params.NAME / self.reports_config.TRAINING_TABEL
+        training_tabel_path = report_dir_path / self.model_params.NAME / self.reports_config.TRAINING_TABEL
         tabel_epoch_path = report_dir_path / self.model_params.NAME / self.reports_config.EPOCH_TABEL
         plot_training_path = report_dir_path / self.model_params.NAME / self.reports_config.TRAINING_PLOT
-        plot_confusion_matrix_path = report_dir_path / self.model_params.NAME / self.reports_config.CONFUSION_MATRIX_PLOT
-        classification_report_path = report_dir_path / self.model_params.NAME / self.reports_config.CLASSIFICATION_REPORT
 
         batch_size =  self.training_params.BATCH_SIZE
         epochs =  self.training_params.EPOCHS
@@ -104,11 +105,9 @@ class ConfigurationManager:
             model_dir_path = model_dir_path,
             model_path = model_path,
             report_dir_path = report_dir_path,
-            tabel_training_path = tabel_training_path,
+            training_tabel_path = training_tabel_path,
             tabel_epoch_path = tabel_epoch_path,
             plot_training_path = plot_training_path,
-            plot_confusion_matrix_path = plot_confusion_matrix_path,
-            classification_report_path = classification_report_path,
             batch_size = batch_size,
             epochs = epochs,
             learning_rate = learning_rate,
@@ -118,6 +117,19 @@ class ConfigurationManager:
 
         return model_trainer_config
 
+
+    def get_model_evaluation_config(self) -> ModelEvaluationConfig:
+        report_dir_path = Path(os.path.join(self.directories_config.ARTIFACTS, self.directories_config.REPORTS))
+
+        plot_confusion_matrix_path = report_dir_path / self.model_params.NAME / self.reports_config.CONFUSION_MATRIX_PLOT
+        classification_report_path = report_dir_path / self.model_params.NAME / self.reports_config.CLASSIFICATION_REPORT
+
+        model_evaluation_config = ModelEvaluationConfig(
+            plot_confusion_matrix_path = plot_confusion_matrix_path,
+            classification_report_path = classification_report_path
+        )
+
+        return model_evaluation_config
 
 
 
@@ -143,17 +155,8 @@ class ConfigurationManager:
 
 # if __name__ == '__main__':
 #     config = ConfigurationManager()
-#     get_config = config.get_model_trainer_config()
-#     print(get_config.model_dir_path)
-#     print(get_config.model_path)
-#     print(get_config.report_dir_path)
-#     print(get_config.tabel_training_path)
+#     get_config = config.get_model_evaluation_config()
 #     print(get_config.tabel_epoch_path)
 #     print(get_config.plot_training_path)
 #     print(get_config.plot_confusion_matrix_path)
 #     print(get_config.classification_report_path)
-#     print(get_config.batch_size)
-#     print(get_config.epochs)
-#     print(get_config.learning_rate)
-#     print(get_config.loss_function)
-#     print(get_config.metrics)

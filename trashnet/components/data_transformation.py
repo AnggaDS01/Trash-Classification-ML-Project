@@ -59,6 +59,7 @@ class DataTransformation:
                     classes = self.data_transformation_config.label_list,
                     train_path  = self.data_ingestion_config.train_dir_path,
                     pattern_regex = self.data_transformation_config.img_ext_regex_pattern,
+                    seed=self.data_transformation_config.seed
                 )
 
                 display_log_message(f"Converting image paths to tf dataset")
@@ -76,7 +77,7 @@ class DataTransformation:
                     dataset=tf_paths,
                     split_ratio=self.data_transformation_config.split_ratio,
                     shuffle=True,
-                    seed=12
+                    seed=self.data_transformation_config.seed
                 )
 
                 display_log_message(f"Showing class distribution")

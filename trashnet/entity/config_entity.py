@@ -19,22 +19,26 @@ class DataTransformationConfig:
     label_list: list
     split_ratio: tuple
     img_size: tuple
+    seed: int
 
 @dataclass
 class ModelTrainerConfig:
     model_dir_path: Path 
     model_path: Path
     report_dir_path: Path 
-    tabel_training_path: Path
+    training_tabel_path: Path
     tabel_epoch_path: Path
     plot_training_path: Path
-    plot_confusion_matrix_path: Path
-    classification_report_path: Path
     batch_size: int
     epochs: int
     learning_rate: float
     loss_function: str
     metrics: list
+
+@dataclass
+class ModelEvaluationConfig:
+    plot_confusion_matrix_path: Path
+    classification_report_path: Path
  
 
 @dataclass
