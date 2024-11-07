@@ -1,4 +1,5 @@
 colorama==0.4.6
+wandb==0.4.6
 dill==0.3.8
 from_root==1.3.0
 huggingface_hub==0.24.6
