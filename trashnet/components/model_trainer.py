@@ -7,7 +7,7 @@ import tensorflow as tf
 import numpy as np
 import wandb
 
-from trashnet.constant.wandb_config import WANDB_CONFIG
+from trashnet.configuration.wandb_config import WANDB_CONFIG
 from trashnet.exception import TrashClassificationException
 from trashnet.entity.config_entity import ModelTrainerConfig
 from trashnet.entity.artifacts_entity import (ModelTrainerArtifact,

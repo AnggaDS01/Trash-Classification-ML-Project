@@ -3,8 +3,12 @@ import inspect
 import re 
 import dill 
 import sys
-
+import yaml
 import numpy as np
+
+from pathlib import Path
+from box import ConfigBox
+from box.exceptions import BoxValueError
 from colorama import init, Fore, Back, Style
 from colorama import Fore, Style
 from trashnet.logger import logging
@@ -124,6 +128,28 @@ def load_object(file_path):
     except FileNotFoundError:
         print(f"File not found: {file_path}")
         return None
+
+def read_yaml(path_to_yaml: Path) -> ConfigBox:
+    """reads yaml file and returns
+
+    Args:
+        path_to_yaml (str): path like input
+
+    Raises:
+        ValueError: if yaml file is empty
+        e: empty file
+
+    Returns:
+        ConfigBox: ConfigBox type
+    """
+    try:
+        with open(path_to_yaml) as yaml_file:
+            content = yaml.safe_load(yaml_file)
+            return ConfigBox(content)
+    except BoxValueError:
+        raise ValueError("yaml file is empty")
+    except Exception as e:
+        raise e
 
 # Fungsi untuk mengecek keberadaan file
 def paths_exist(paths):

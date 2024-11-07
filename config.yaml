@@ -1,0 +1,36 @@
+# Directories
+DIRECTORIES:
+  ARTIFACTS: "artifacts"
+  DATA_INGESTION: "data_ingestion"
+  DATA_TRANSFORMATION: "data_transformation"
+  OBJECTS: "objects"
+  REPORTS: "reports"
+  MODELS: "models"
+
+# Data Configuration
+DATA:
+  TRAIN_DIR: "dataset-resized"
+  DOWNLOAD_URL: "https://huggingface.co/datasets/garythung/trashnet/resolve/main/dataset-resized.zip"
+  IMAGE_EXTENSION_REGEX: "\\.(jpe?g|png)$"
+
+# TFRecord Files
+TFRECORDS:
+  TRAIN_FILE: "train_trashnet.tfrecord"
+  VALID_FILE: "valid_trashnet.tfrecord"
+
+# Model Files
+MODEL:
+  KERAS_FILE: "_model.keras"
+
+# Objects & Labels
+OBJECTS:
+  LABEL_LIST_FILE: "label_list.pkl"
+  CLASS_WEIGHTS_FILE: "class_weights.pkl"
+
+# Training & Report Files
+REPORTS:
+  TRAINING_TABLE: "tabel_pelatihan.csv"
+  EPOCH_TABLE: "tabel_epoch.csv"
+  TRAINING_PLOT: "plot_pelatihan.png"
+  CONFUSION_MATRIX_PLOT: "plot_confusion_matrix.png"
+  CLASSIFICATION_REPORT: "classification_report.txt"

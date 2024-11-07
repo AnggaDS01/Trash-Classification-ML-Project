@@ -1,0 +1,22 @@
+# Model Parameters
+MODEL:
+  NAME: DenseNet121
+  IMAGE_SIZE: [224, 224]
+
+# Dataset Parameters
+DATASET:
+  NAME: TrashNet
+  SPLIT_RATIO: [0.9, 0.1]
+  LABEL_LIST: ['cardboard', 'glass', 'metal', 'paper', 'plastic', 'trash']
+
+# Training Parameters
+TRAINING:
+  BATCH_SIZE: 32
+  EPOCHS: 150
+  LEARNING_RATE: 0.0001
+  LOSS_FUNCTION: sparse_categorical_crossentropy
+  METRICS: ['accuracy']
+
+# Weights and Biases (W&B) Parameters
+WANDB:
+  PROJECT_NAME: trashnet-adatama-test-01
