@@ -5,6 +5,7 @@ from trashnet.components.data_ingestion import DataIngestion
 from trashnet.components.data_transformation import DataTransformation
 from trashnet.components.model_trainer import ModelTrainer
 from trashnet.components.model_evaluation import ModelEvaluation
+from trashnet.components.model_pusher import ModelPusher
 
 from trashnet.configuration.configuration import ConfigurationManager
 
@@ -20,6 +21,7 @@ class TrainPipeline:
         self.data_transformation_config = config.get_data_transformation_config()
         self.model_trainer_config = config.get_model_trainer_config()
         self.model_evaluation_config = config.get_model_evaluation_config()
+        self.model_pusher_config = config.get_model_pusher_config()
         self.wandb_config = config.get_wandb_config()
 
     
@@ -103,7 +105,30 @@ class TrainPipeline:
                 # wandb_config = self.wandb_config
             )
 
-            model_trainer_config = model_trainer.initiate_model_trainer()
+            model_trainer_config = model_trainer.initiate_model_evaluation()
+
+            display_log_message(f"Exited the {color_text(function_name)} method of {color_text('TrainPipeline')} class in {color_text(file_name_function)}\n\n")
+
+            return model_trainer_config
+
+        except Exception as e:
+            raise TrashClassificationException(e, sys)
+        
+
+    def start_model_pusher(
+            self,
+            model_trainer_config,
+        ):
+        try:
+            function_name, file_name_function = display_function_name(inspect.currentframe())
+            display_log_message(f"Started the {color_text(function_name)} method of {color_text('TrainPipeline')} class in {color_text(file_name_function)}")
+
+            model_pusher = ModelPusher(
+                model_trainer_config = model_trainer_config,
+                model_pusher_config = self.model_pusher_config,
+            )
+
+            model_pusher.initiate_model_pusher()
 
             display_log_message(f"Exited the {color_text(function_name)} method of {color_text('TrainPipeline')} class in {color_text(file_name_function)}\n\n")
 
@@ -113,15 +138,22 @@ class TrainPipeline:
             raise TrashClassificationException(e, sys)
         
         
+        
+        
 
     def run_pipeline(self) -> None:
         try:
             data_ingestion_config = self.start_data_ingestion()
             data_transformation_config = self.start_data_transformation(data_ingestion_config)
             model_trainer_config = self.start_model_trainer(data_transformation_config)
-            model_evaluation_config = self.start_model_evaluation(data_transformation_config, model_trainer_config)
+            self.start_model_evaluation(data_transformation_config, model_trainer_config)
+            self.start_model_pusher(model_trainer_config)
 
-            return model_evaluation_config
+            return 
 
         except Exception as e:
             raise TrashClassificationException(e, sys)
+        
+if __name__ == "__main__":
+    train_pipeline = TrainPipeline()
+    train_pipeline.run_pipeline()

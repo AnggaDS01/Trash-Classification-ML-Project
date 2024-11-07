@@ -14,6 +14,7 @@ class HyperparameterTuningPipeline:
     def __init__(self):
         config = ConfigurationManager()
         self.data_transformation_config = config.get_data_transformation_config()
+        self.model_trainer_config = config.get_model_trainer_config()
         self.wandb_config = config.get_wandb_config()
     
     def start_hyperparameter_tuning(
@@ -25,6 +26,7 @@ class HyperparameterTuningPipeline:
 
             hyperparameter_tuning = HyperParameterTuning(
                 data_transformation_config = self.data_transformation_config,
+                model_trainer_config = self.model_trainer_config,
                 wandb_config = self.wandb_config,
             )
 

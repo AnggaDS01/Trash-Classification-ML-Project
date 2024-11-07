@@ -34,3 +34,7 @@ REPORTS:
   TRAINING_PLOT: "training_plot.png"
   CONFUSION_MATRIX_PLOT: "confusion_matrix_plot.png"
   CLASSIFICATION_REPORT: "classification_report.txt"
+
+HUGGINGFACE:
+  REPO_ID: Anggads01/trashnet-classifier
+  COMMIT_MSG: "Upload DenseNet121 model in .keras format"

@@ -2,11 +2,13 @@ import os
 
 from trashnet.constant import *
 from pathlib import Path
+from datetime import datetime
 from trashnet.utils.main_utils import read_yaml
 from trashnet.entity.config_entity import (DataIngestionConfig,
                                            DataTransformationConfig,
                                            ModelTrainerConfig,
                                            ModelEvaluationConfig,
+                                           ModelPusher,
                                            WandbConfig)
 
 
@@ -19,12 +21,16 @@ class ConfigurationManager:
         self.config = read_yaml(config_filepath)
         self.params = read_yaml(params_filepath)
 
+        TIMESTAMP: str = datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
+
+        self.artifacts_config = os.path.join(self.config.DIRECTORIES.ARTIFACTS, TIMESTAMP)
         self.directories_config = self.config.DIRECTORIES
         self.data_config = self.config.DATA
         self.tfrecords_config = self.config.TFRECORDS
         self.model_config = self.config.MODEL
         self.objects_config = self.config.OBJECTS
         self.reports_config = self.config.REPORTS
+        self.huggingface_config = self.config.HUGGINGFACE
 
         self.model_params = self.params.MODEL
         self.dataset_params = self.params.DATASET
@@ -36,7 +42,7 @@ class ConfigurationManager:
 
 
     def get_data_ingestion_config(self) -> DataIngestionConfig:
-        data_ingestion_dir_path = Path(os.path.join(self.directories_config.ARTIFACTS, self.directories_config.DATA_INGESTION))
+        data_ingestion_dir_path = Path(os.path.join(self.artifacts_config, self.directories_config.DATA_INGESTION))
         train_dir_path = data_ingestion_dir_path / self.data_config.TRAIN_DIR
 
         data_download_url = self.data_config.DOWNLOAD_URL
@@ -52,13 +58,12 @@ class ConfigurationManager:
 
 
 
-
     def get_data_transformation_config(self) -> DataTransformationConfig:
-        data_transformation_dir_path = Path(os.path.join(self.directories_config.ARTIFACTS, self.directories_config.DATA_TRANSFORMATION))
+        data_transformation_dir_path = Path(os.path.join(self.artifacts_config, self.directories_config.DATA_TRANSFORMATION))
         train_tfrecord_data_path = data_transformation_dir_path / self.tfrecords_config.TRAIN_FILE
         valid_tfrecord_data_path = data_transformation_dir_path / self.tfrecords_config.VALID_FILE
         
-        object_dir_path = Path(os.path.join(self.directories_config.ARTIFACTS, self.directories_config.OBJECTS))
+        object_dir_path = Path(os.path.join(self.artifacts_config, self.directories_config.OBJECTS))
         label_list_path = object_dir_path / self.objects_config.LABEL_LIST_FILE
         class_weights_path = object_dir_path / self.objects_config.CLASS_WEIGHTS_FILE
 
@@ -87,10 +92,10 @@ class ConfigurationManager:
 
 
     def get_model_trainer_config(self) -> ModelTrainerConfig:
-        model_dir_path =  Path(os.path.join(self.directories_config.ARTIFACTS, self.directories_config.MODELS))
+        model_dir_path =  Path(os.path.join(self.artifacts_config, self.directories_config.MODELS))
         model_path = model_dir_path / (self.model_params.NAME + self.model_config.KERAS_FILE)
 
-        report_dir_path = Path(os.path.join(self.directories_config.ARTIFACTS, self.directories_config.REPORTS))
+        report_dir_path = Path(os.path.join(self.artifacts_config, self.directories_config.REPORTS))
         training_tabel_path = report_dir_path / self.model_params.NAME / self.reports_config.TRAINING_TABEL
         tabel_epoch_path = report_dir_path / self.model_params.NAME / self.reports_config.EPOCH_TABEL
         plot_training_path = report_dir_path / self.model_params.NAME / self.reports_config.TRAINING_PLOT
@@ -120,7 +125,7 @@ class ConfigurationManager:
 
 
     def get_model_evaluation_config(self) -> ModelEvaluationConfig:
-        report_dir_path = Path(os.path.join(self.directories_config.ARTIFACTS, self.directories_config.REPORTS))
+        report_dir_path = Path(os.path.join(self.artifacts_config, self.directories_config.REPORTS))
 
         plot_confusion_matrix_path = report_dir_path / self.model_params.NAME / self.reports_config.CONFUSION_MATRIX_PLOT
         classification_report_path = report_dir_path / self.model_params.NAME / self.reports_config.CLASSIFICATION_REPORT
@@ -137,6 +142,16 @@ class ConfigurationManager:
 
         return model_evaluation_config
 
+    def get_model_pusher_config(self) -> ModelPusher:
+        repo_id = self.huggingface_config.REPO_ID
+        commit_msg = self.huggingface_config.COMMIT_MSG
+
+        model_evaluation_config = ModelPusher(
+            repo_id= repo_id,
+            commit_msg= commit_msg
+        )
+
+        return model_evaluation_config
 
 
     def get_wandb_config(self) -> WandbConfig:
@@ -165,10 +180,9 @@ class ConfigurationManager:
 
         return wandb_config
 
-if __name__ == '__main__':
-    config = ConfigurationManager()
-    get_config = config.get_wandb_config()
+# if __name__ == '__main__':
+#     config = ConfigurationManager()
+#     get_config = config.get_model_pusher_config()
 
-    print(get_config.config)
-    print(get_config.project)
-    print(get_config.sweep_config)
+#     print(get_config.repo_id)
+#     print(get_config.commit_msg)

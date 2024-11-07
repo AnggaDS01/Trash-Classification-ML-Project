@@ -1,0 +1,43 @@
+name: Model Training Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout code dari repo
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Step 2: Setup Python Environment
+      - name: Setup Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.9'
+
+      # Step 3: Install dependencies
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Step 4: Setup WANDB API Key
+      - name: Setup WANDB API Key
+        env:
+          WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
+        run: |
+          if [ -z "$WANDB_API_KEY" ]; then
+            echo "WANDB_API_KEY is not set. Please add it in your GitHub secrets."
+            exit 1
+          fi
+
+      # Step 5: Run the training script
+      - name: Run Model Training
+        run: |
+          python trashnet/pipeline/training_pipeline.py

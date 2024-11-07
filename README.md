@@ -12,12 +12,12 @@ cd Trash-Classification-ML-Project
 ```
 
 ## **Step 2 Create a virtual environment after opening the repository**
-Here I am using python version 3.11.10, make sure the python version you are using is 3.10+, in creating a virtual environment you can use [Anaconda](https://www.anaconda.com/download/success) or [Miniconda](https://docs.anaconda.com/miniconda/), here I use Miniconda version 24.9.2, to create it you can type the following command:
+Here I am using python version 3.9.2, in creating a virtual environment you can use [Anaconda](https://www.anaconda.com/download/success) or [Miniconda](https://docs.anaconda.com/miniconda/), here I use Miniconda version 24.9.2, to create it you can type the following command:
 
 ### **Step 2.1 Create a virtual environment using the conda prompt**
 ```bash
 # conda create -n <directory_name> python=<python_version> ipython
-conda create -n "myenv" python=3.11.10 ipython
+conda create -n "myenv" python=3.9.2 ipython
 ```
 
 #### **Step 2.1.1 Activate the virtual environment**

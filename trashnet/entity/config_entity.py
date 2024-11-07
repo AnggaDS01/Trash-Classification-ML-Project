@@ -41,7 +41,12 @@ class ModelEvaluationConfig:
     classification_report_path: Path
     normalize: bool
     figsize: tuple
- 
+
+@dataclass
+class ModelPusher:
+    repo_id: str
+    commit_msg: str
+
 
 @dataclass
 class WandbConfig:

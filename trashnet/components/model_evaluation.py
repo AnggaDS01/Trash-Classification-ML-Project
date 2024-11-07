@@ -30,7 +30,7 @@ class ModelEvaluation:
         except Exception as e:
             raise TrashClassificationException(e, sys)
         
-    def initiate_model_trainer(self):
+    def initiate_model_evaluation(self):
         function_name, file_name_function = display_function_name(inspect.currentframe())
         display_log_message(f"Entered {color_text(function_name)} method of {color_text('ModelEvaluation')} class in {color_text(file_name_function)}")
 

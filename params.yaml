@@ -1,6 +1,6 @@
 # Model Parameters
 MODEL:
-  NAME: DenseNet121
+  NAME: DenseNet121_02
   IMAGE_SIZE: [224, 224]
 
 # Dataset Parameters
@@ -13,7 +13,7 @@ DATASET:
 TRAINING:
   SEED: 42
   BATCH_SIZE: 32
-  EPOCHS: 3
+  EPOCHS: 1
   LEARNING_RATE: 0.001
   LOSS_FUNCTION: sparse_categorical_crossentropy
   METRICS: ['accuracy']
@@ -35,6 +35,6 @@ WANDB:
       learning_rate:
         values: [0.0001, 0.001]
       batch_size:
-        values: [16, 32, 64]
+        values: [32, 64]
       epochs:
-        values: [30]
+        values: [1]
