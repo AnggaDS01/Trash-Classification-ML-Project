@@ -43,7 +43,7 @@ class ModelPusher:
 
             upload_file(
                 path_or_fileobj=local_model_path, 
-                path_in_repo=local_model_path.split("/")[-1], 
+                path_in_repo=local_model_path.split(os.path.sep)[-1], 
                 repo_id=repo_id,
                 commit_message=self.model_pusher_config.commit_msg
             )
@@ -51,8 +51,7 @@ class ModelPusher:
             display_log_message(f"Exited {color_text(function_name)} method of {color_text('ModelPusher')} class in {color_text(file_name_function)}")
             display_log_message(f"Model Pusher config: {color_text(self.model_evaluation_config)}")
 
-            return self.model_evaluation_config
-
+            return 
         except Exception as e:
             raise TrashClassificationException(e, sys)
 
