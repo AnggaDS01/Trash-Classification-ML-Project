@@ -148,8 +148,6 @@ class ModelTrainer:
                     ]
                 )
 
-                wandb.finish()
-
                 display_log_message(f"Saving tabel epoch to {color_text(self.model_trainer_config.tabel_epoch_path)}")
                 history_df = pd.DataFrame(history.history).reset_index()
                 history_df.rename(columns={'index': 'epoch'}, inplace=True)
@@ -166,6 +164,8 @@ class ModelTrainer:
                 tabel_epoch_dir_path = os.path.dirname(self.model_trainer_config.tabel_epoch_path)
                 os.makedirs(tabel_epoch_dir_path, exist_ok=True)
                 history_df.to_csv(self.model_trainer_config.tabel_epoch_path, index=False)
+
+                # wandb.finish()
 
                 display_log_message(f"Saveing plot training history")
                 plot_training_history(history, self.model_trainer_config.plot_training_path)

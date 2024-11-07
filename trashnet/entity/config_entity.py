@@ -39,9 +39,13 @@ class ModelTrainerConfig:
 class ModelEvaluationConfig:
     plot_confusion_matrix_path: Path
     classification_report_path: Path
+    normalize: bool
+    figsize: tuple
  
 
 @dataclass
 class WandbConfig:
     project: str
     config: dict
+    sweep_config: dict
+    sweep_count: int

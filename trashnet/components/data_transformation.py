@@ -1,6 +1,8 @@
 import sys
 import inspect 
 import tensorflow as tf
+import numpy as np
+import random
 
 from trashnet.exception import TrashClassificationException
 from trashnet.ml.image_processor import ImagePreprocessor
@@ -31,6 +33,10 @@ class DataTransformation:
            raise TrashClassificationException(e, sys)
 
     def initiate_data_transformation(self):
+        tf.random.set_seed(self.data_transformation_config.seed)
+        np.random.seed(self.data_transformation_config.seed)
+        random.seed(self.data_transformation_config.seed)
+
         function_name, file_name_function = display_function_name(inspect.currentframe())
         display_log_message(f"Entered {color_text(function_name)} method of {color_text('DataTransformation')} class in {color_text(file_name_function)}")
 

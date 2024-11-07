@@ -29,6 +29,7 @@ class ConfigurationManager:
         self.model_params = self.params.MODEL
         self.dataset_params = self.params.DATASET
         self.training_params = self.params.TRAINING
+        self.evaluation_params = self.params.EVALUATION
         self.wandb_params = self.params.WANDB
     
 
@@ -124,9 +125,14 @@ class ConfigurationManager:
         plot_confusion_matrix_path = report_dir_path / self.model_params.NAME / self.reports_config.CONFUSION_MATRIX_PLOT
         classification_report_path = report_dir_path / self.model_params.NAME / self.reports_config.CLASSIFICATION_REPORT
 
+        normalize = self.evaluation_params.NORMALIZE_CONFUSION_MATRIX
+        figsize = tuple(self.evaluation_params.FIGSIZE)
+
         model_evaluation_config = ModelEvaluationConfig(
             plot_confusion_matrix_path = plot_confusion_matrix_path,
-            classification_report_path = classification_report_path
+            classification_report_path = classification_report_path,
+            normalize = normalize,
+            figsize = figsize
         )
 
         return model_evaluation_config
@@ -145,18 +151,24 @@ class ConfigurationManager:
         }
 
         project = self.wandb_params.PROJECT_NAME
+
+        sweep_config = self.wandb_params.SWEEP_CONFIG
+
+        sweep_count = self.wandb_params.SWEEP_COUNT
         
         wandb_config = WandbConfig(
             config = config,
-            project = project
+            project = project,
+            sweep_config = sweep_config,
+            sweep_count = sweep_count
         )
 
         return wandb_config
 
-# if __name__ == '__main__':
-#     config = ConfigurationManager()
-#     get_config = config.get_model_evaluation_config()
-#     print(get_config.tabel_epoch_path)
-#     print(get_config.plot_training_path)
-#     print(get_config.plot_confusion_matrix_path)
-#     print(get_config.classification_report_path)
+if __name__ == '__main__':
+    config = ConfigurationManager()
+    get_config = config.get_wandb_config()
+
+    print(get_config.config)
+    print(get_config.project)
+    print(get_config.sweep_config)

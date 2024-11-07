@@ -18,6 +18,23 @@ TRAINING:
   LOSS_FUNCTION: sparse_categorical_crossentropy
   METRICS: ['accuracy']
 
+EVALUATION:
+  NORMALIZE_CONFUSION_MATRIX: True
+  FIGSIZE: [18, 12]
+
 # Weights and Biases (W&B) Parameters
 WANDB:
   PROJECT_NAME: trashnet-adatama-test-01
+  SWEEP_COUNT: 5
+  SWEEP_CONFIG:
+    method: random
+    metric:
+      name: val_accuracy
+      goal: maximize
+    parameters:
+      learning_rate:
+        values: [0.0001, 0.001]
+      batch_size:
+        values: [16, 32, 64]
+      epochs:
+        values: [30]
