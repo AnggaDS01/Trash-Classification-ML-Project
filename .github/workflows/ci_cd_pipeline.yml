@@ -37,7 +37,20 @@ jobs:
             exit 1
           fi
 
-      # Step 5: Run the training script
-      - name: Run Model Training
+      # Step 5: Setup Hugging Face API Token
+      - name: Setup Hugging Face Token
+        env:
+          HUGGINGFACE_TOKEN: ${{ secrets.HUGGINGFACE_TOKEN }}
+        run: |
+          if [ -z "$HUGGINGFACE_TOKEN" ]; then
+            echo "HUGGINGFACE_TOKEN is not set. Please add it in your GitHub secrets."
+            exit 1
+          fi
+
+      # Step 6: Run the training and model pushing script
+      - name: Run Model Training and Pushing to Hugging Face
+        env:
+          WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
+          HUGGINGFACE_TOKEN: ${{ secrets.HUGGINGFACE_TOKEN }}
         run: |
           python trashnet/pipeline/training_pipeline.py

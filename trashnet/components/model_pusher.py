@@ -49,7 +49,7 @@ class ModelPusher:
             )
 
             display_log_message(f"Exited {color_text(function_name)} method of {color_text('ModelPusher')} class in {color_text(file_name_function)}")
-            display_log_message(f"Model Pusher config: {color_text(self.model_evaluation_config)}")
+
 
             return 
         except Exception as e:
