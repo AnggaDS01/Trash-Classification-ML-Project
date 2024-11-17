@@ -69,22 +69,28 @@ def display_log_message(msg, is_log=True):
         msg_no_color = remove_color_codes(msg)
         logging.info(msg_no_color)
 
-def display_function_name(function_) -> None:
+def display_function_info(frame) -> tuple:
     """
-    Displays the name and file location of a given function.
+    Retrieves the name of the function, class, and file location 
+    of the calling function for display purposes.
 
     Args:
-        function_ (frame): A frame object representing the function to display information for.
+        frame (frame): A frame object representing the function 
+                       or method to display information for.
 
     Returns:
-        None
+        tuple: A tuple containing the function name, class name 
+               (or None if not in a class), and file name.
     """
-    
     # Retrieve the function's name and the file in which it is defined
-    function_name = function_.f_code.co_name
-    file_name_function = inspect.getfile(function_)
+    function_name = frame.f_code.co_name
+    file_name = inspect.getfile(frame)
     
-    return function_name, file_name_function
+    # Check if there is a class context and retrieve class name if exists
+    class_name = frame.f_locals.get('self')
+    class_name = class_name.__class__.__name__ if class_name else None
+    
+    return function_name, class_name, file_name
 
 def custom_title_print(title, n_strip=110):
     """
@@ -171,15 +177,17 @@ def read_yaml(path_to_yaml: Path) -> ConfigBox:
     except Exception as e:
         raise e
 
-# Fungsi untuk mengecek keberadaan file
-def paths_exist(paths):
-    missing_paths = [path for path in paths if not os.path.exists(path)]
-    
-    if missing_paths:
-        for path in missing_paths:
-            logging.info(f"{path} not found.")
-        return False
-    return True
+def create_directories(path_to_directories: list, verbose=True):
+    """create list of directories
+
+    Args:
+        path_to_directories (list): list of path of directories
+        ignore_log (bool, optional): ignore if multiple dirs is to be created. Defaults to False.
+    """
+    for path in path_to_directories:
+        os.makedirs(path, exist_ok=True)
+        if verbose:
+            display_log_message(f"created directory at: {color_text(path)}")
 
 class DataInspector:
     """
