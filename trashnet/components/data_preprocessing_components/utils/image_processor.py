@@ -8,7 +8,13 @@ class ImagePreprocessor:
     dan augmentasi gambar untuk dataset pelatihan, validasi, dan pengujian.
     """
 
-    def __init__(self, label_index, label_encoding, target_size=(200, 200), is_gray=False):
+    def __init__(
+            self, 
+            label_index, 
+            label_encoding, 
+            target_size=(200, 200, 3), 
+        ):
+
         """
         Inisialisasi kelas `ImagePreprocessor`.
 
@@ -21,26 +27,26 @@ class ImagePreprocessor:
         self.label_index = label_index
         self.label_encoding = label_encoding
         self.target_size = target_size
-        self.is_gray = is_gray
-        self.channels = 1 if self.is_gray else 3
 
     # ===================================================================================================
     # ------------------------------------ _CONVERT_PATH_TO_IMAGE_SINGLE --------------------------------
     # ===================================================================================================
 
-    def _convert_path_to_image_single(self, image_path):
+    def _convert_path_to_image_single(
+            self, 
+            image_path
+        ):
+
         """
-        Mengonversi jalur file gambar menjadi gambar dan label.
-
+        Converts image file paths to images and labels.
         Args:
-            image_path (str): Jalur file gambar.
-
+            image_path (str): The path of the image file.
         Returns:
-            tuple: Gambar yang dikonversi, label numerik, dan jalur file gambar.
+            Tuple: The converted image, numeric label, and image file path.
         """
         image = tf.io.read_file(image_path)
-        image = tf.image.decode_image(image, channels= self.channels)
-        image.set_shape([None, None,  self.channels])
+        image = tf.image.decode_image(image, channels= self.target_size[-1])
+        image.set_shape([None, None,  self.target_size[-1]])
         split_img_path = tf.strings.split(image_path, os.path.sep)
         label = self.label_encoding.lookup(split_img_path[self.label_index])
         return image, label, image_path
@@ -49,16 +55,19 @@ class ImagePreprocessor:
     # ------------------------------------ _RESIZE_IMAGE ------------------------------------------------
     # ===================================================================================================
 
-    def _resize_image(self, image, label):
+    def _resize_image(
+            self, 
+            image, 
+            label
+        ):
+
         """
-        Mengubah ukuran gambar ke ukuran target yang telah ditentukan.
-
+        Resizes the image to a predefined target size.
         Args:
-            image (tf.Tensor): Gambar input.
-            label (int): Label gambar.
-
+            image (tf.Tensor): The input image.
+            label (int): Image label.
         Returns:
-            tuple: Gambar yang diubah ukurannya dan label.
+            Tuple: The resized image and the label.
         """
         image = tf.image.resize(image, size=(self.target_size[0], self.target_size[1]))
         image = tf.cast(image, tf.uint8)
@@ -68,16 +77,19 @@ class ImagePreprocessor:
     # ------------------------------------ _NORMALIZE_IMAGE ---------------------------------------------
     # ===================================================================================================
 
-    def _normalize_image(self, image, label):
+    def _normalize_image(
+            self, 
+            image, 
+            label
+        ):
+
         """
-        Melakukan normalisasi gambar dengan membagi nilai pixel dengan 255.
-
+        Normalizes the image by dividing the pixel value by 255.
         Args:
-            image (tf.Tensor): Gambar input.
-            label (int): Label gambar.
-
+            image (tf.Tensor): The input image.
+            label (int): The label of the image.
         Returns:
-            tuple: Gambar yang dinormalisasi dan label.
+            Tuple: Normalized image and label.
         """
         image = tf.cast(image, tf.float32)
         image = image / 255.0
@@ -88,16 +100,19 @@ class ImagePreprocessor:
     # ------------------------------------ _AUGMENT_IMAGE -----------------------------------------------
     # ===================================================================================================
 
-    def _augment_image(self, image, label=None):
+    def _augment_image(
+            self, 
+            image, 
+            label=None
+        ):
+
         """
-        Melakukan augmentasi pada gambar, termasuk flipping horizontal dan vertikal serta rotasi 90 atau -90 derajat.
-
+        Performs augmentation on images, including horizontal and vertical flipping and 90 or -90 degree rotation.
         Args:
-            image (tf.Tensor): Gambar input.
-            label (int, optional): Label gambar.
-
+            image (tf.Tensor): The input image.
+            label (int, optional): The label of the image.
         Returns:
-            tuple: Gambar yang telah diaugmentasi dan label (jika ada).
+            Tuple: The augmented image and the label (if any).
         """
 
         image = tf.image.random_brightness(image, max_delta=0.2)
@@ -113,15 +128,16 @@ class ImagePreprocessor:
     # ------------------------------------ _APPLY_CONVERT_PATH_TO_IMAGE ---------------------------------
     # ===================================================================================================
 
-    def _apply_convert_path_to_image(self, dataset):
+    def _apply_convert_path_to_image(
+            self, 
+            dataset
+        ):
         """
-        Melakukan konversi jalur file ke gambar untuk dataset tertentu.
-
+        Performs file path to image conversion for the specified dataset.
         Args:
-            dataset (tf.data.Dataset): Dataset jalur file gambar.
-
+            dataset(tf.data.Dataset): Image file path dataset.
         Returns:
-            tf.data.Dataset: Dataset gambar yang dikonversi dari jalur file.
+            tf.data.Dataset: The converted image dataset of the file path.
         """
         return dataset.map(
             map_func=lambda image_path: self._convert_path_to_image_single(image_path),
@@ -132,15 +148,17 @@ class ImagePreprocessor:
     # ------------------------------------ _APPLY_IMAGE_RESIZING ----------------------------------------
     # ===================================================================================================
 
-    def _apply_image_resizing(self, dataset):
+    def _apply_image_resizing(
+            self, 
+            dataset
+        ):
+
         """
-        Mengubah ukuran gambar pada dataset tertentu.
-
+        Resize the image in a specific dataset.
         Args:
-            dataset (tf.data.Dataset): Dataset gambar.
-
+            dataset (tf.data.Dataset): The image dataset.
         Returns:
-            tf.data.Dataset: Dataset gambar yang sudah diubah ukurannya.
+            tf.data.Dataset: The resized image dataset.
         """
         return dataset.map(
             map_func=lambda image, label, path: self._resize_image(image, label),
@@ -152,15 +170,17 @@ class ImagePreprocessor:
     # ------------------------------------ _APPLY_IMAGE_NORMALIZATION -----------------------------------
     # ===================================================================================================
 
-    def _apply_image_normalization(self, dataset):
+    def _apply_image_normalization(
+            self, 
+            dataset
+        ):
+
         """
-        Melakukan normalisasi gambar pada dataset tertentu.
-
+        Performs image normalization on the specified dataset.
         Args:
-            dataset (tf.data.Dataset): Dataset gambar.
-
+            dataset(tf.data.Dataset): The image dataset.
         Returns:
-            tf.data.Dataset: Dataset gambar yang sudah dinormalisasi.
+            tf.data.Dataset: The normalized image dataset.
         """
         return dataset.map(
             map_func=lambda image, label: self._normalize_image(image, label),
@@ -171,15 +191,17 @@ class ImagePreprocessor:
     # ------------------------------------ _APPLY_IMAGE_AUGMENTATION ------------------------------------
     # ===================================================================================================
 
-    def _apply_image_augmentation(self, dataset):
+    def _apply_image_augmentation(
+            self, 
+            dataset
+        ):
+
         """
-        Melakukan augmentasi gambar pada dataset tertentu.
-
+        Performs image augmentation on the specified dataset.
         Args:
-            dataset (tf.data.Dataset): Dataset gambar.
-
+            dataset(tf.data.Dataset): The image dataset.
         Returns:
-            tf.data.Dataset: Dataset gambar yang sudah diaugmentasi.
+            tf.data.Dataset: The image dataset that has been augmented.
         """
         return dataset.map(
             map_func=lambda image, label: self._augment_image(image, label),
@@ -189,7 +211,11 @@ class ImagePreprocessor:
     # ===================================================================================================
     # ------------------------------------ CONVERT_PATH_TO_IMAGE ----------------------------------------
     # ===================================================================================================
-    def convert_path_to_image(self, **datasets):
+    def convert_path_to_image(
+            self, 
+            **datasets
+        ):
+
         """
         """
         return (self._apply_convert_path_to_image(dataset) for dataset in datasets.values())
@@ -198,7 +224,11 @@ class ImagePreprocessor:
     # ===================================================================================================
     # ----------------------------------------- IMAGE_RESIZING ------------------------------------------
     # ===================================================================================================
-    def image_resizing(self, **datasets):
+    def image_resizing(
+            self, 
+            **datasets
+        ):
+
         """
         """
         return (self._apply_image_resizing(dataset) for dataset in datasets.values())
@@ -207,7 +237,11 @@ class ImagePreprocessor:
     # ===================================================================================================
     # ------------------------------------ IMAGE_NORMALIZATION ------------------------------------------
     # ===================================================================================================
-    def image_normalization(self, **datasets):
+    def image_normalization(
+            self, 
+            **datasets
+        ):
+
         """
         """
         return (self._apply_image_normalization(dataset) for dataset in datasets.values())
@@ -215,8 +249,11 @@ class ImagePreprocessor:
     # ===================================================================================================
     # ------------------------------------ IMAGE_AUGMENTATION--------------------------------------------
     # ===================================================================================================
-    def image_augmentation(self, **datasets):
+    def image_augmentation(
+            self, 
+            **datasets
+        ):
+
         """
         """
         return (self._apply_image_augmentation(dataset) for dataset in datasets.values())
-    

@@ -9,14 +9,12 @@ class DataIngestionConfig:
     data_download_url: str
 
 @dataclass
-class DataTransformationConfig:
-    data_transformation_dir_path: Path
-    train_tfrecord_data_path: Path
-    valid_tfrecord_data_path: Path
-    object_dir_path: Path
-    label_list_path: Path
-    class_weights_path: Path
-    img_ext_regex_pattern: str
+class DataPreprocessingConfig:
+    train_tfrecord_file_path: Path
+    valid_tfrecord_file_path: Path
+    labels_list_file_path: Path
+    class_weights_file_path: Path
+    image_extension_regex: str
     label_list: list
     split_ratio: tuple
     img_size: tuple

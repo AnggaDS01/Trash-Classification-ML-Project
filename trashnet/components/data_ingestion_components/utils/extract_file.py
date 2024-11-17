@@ -1,8 +1,7 @@
-import os
 import sys
 import zipfile
 
-from trashnet.utils.main_utils import display_log_message
+from trashnet.utils.main_utils import display_log_message, color_text
 from trashnet.exception import TrashClassificationException
 from pathlib import Path
 
@@ -25,12 +24,12 @@ def extract_zip(
     try:
         with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
             zip_ref.extractall(extract_dir)
-            display_log_message(f"Files extracted to {extract_dir}", is_log=False)
+            display_log_message(f"Files extracted to {color_text(extract_dir)}")
 
         # Remove zip file if specified
-        if is_file_removed and os.path.exists(zip_file_path):
-            os.remove(zip_file_path)
-            display_log_message("Downloaded zip file removed.", is_log=False)
+        if is_file_removed and zip_file_path.exists():
+            zip_file_path.unlink()
+            display_log_message("Downloaded zip file removed.")
 
     except zipfile.BadZipFile:
         raise Exception("Error: The downloaded file is not a valid zip file.")

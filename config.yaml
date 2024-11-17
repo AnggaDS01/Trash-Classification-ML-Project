@@ -1,34 +1,34 @@
-artifacts_root_dir: artifacts
+ARTIFACTS_ROOT_DIR: artifacts
 
-data_ingestion:
-  data_ingestion_dir_path: artifacts/data_ingestion
-  data_download_store_dir_path: artifacts/data_ingestion/dataset-resized
-  zip_file_path: artifacts/data_ingestion/dataset-resized.zip
-  data_download_url: https://huggingface.co/datasets/garythung/trashnet/resolve/main/dataset-resized.zip
+DATA_INGESTION:
+  DATA_INGESTION_DIR_PATH: artifacts/data_ingestion
+  DATA_DOWNLOAD_STORE_DIR_PATH: artifacts/data_ingestion/dataset-resized
+  ZIP_FILE_PATH: artifacts/data_ingestion/dataset-resized.zip
+  DATA_DOWNLOAD_URL: https://huggingface.co/datasets/garythung/trashnet/resolve/main/dataset-resized.zip
 
-data_preprocessing:
-  tfrecords_dir_path: artifacts/data_preprocessing/tfrecord
-  train_file_path: artifacts/data_preprocessing/train_trashnet.tfrecord
-  valid_file_path: artifacts/data_preprocessing/valid_trashnet.tfrecord
-  objects_dir_path: artifacts/data_preprocessing/objects
-  labels_list_file_path: artifacts/data_preprocessing/objects/label_list.pkl
-  class_weights_file_path: artifacts/data_preprocessing/objects/class_weights.pkl
-  image_extension_regex: "\\.(jpe?g|png)$"
+DATA_PREPROCESSING:
+  TFRECORDS_DIR_PATH: artifacts/data_preprocessing/tfrecord
+  TRAIN_TFRECORD_FILE_PATH: artifacts/data_preprocessing/train_trashnet.tfrecord
+  VALID_TFRECORD_FILE_PATH: artifacts/data_preprocessing/valid_trashnet.tfrecord
+  OBJECTS_DIR_PATH: artifacts/data_preprocessing/objects
+  LABELS_LIST_FILE_PATH: artifacts/data_preprocessing/objects/label_list.pkl
+  CLASS_WEIGHTS_FILE_PATH: artifacts/data_preprocessing/objects/class_weights.pkl
+  IMAGE_EXTENSION_REGEX: "\\.(jpe?g|png)$"
 
-model_training:
-  models_dir_path: artifacts/results/model/best_model.keras
-  training_tabel_path: artifacts/results/reports/training_tabel.csv
-  epoch_tabel_path: artifacts/results/reports/epoch_tabel.csv
-  training_plot_path: artifacts/results/reports/training_plot.png
+MODEL_TRAINING:
+  MODELS_DIR_PATH: artifacts/results/model/best_model.keras
+  TRAINING_TABEL_PATH: artifacts/results/reports/training_tabel.csv
+  EPOCH_TABEL_PATH: artifacts/results/reports/epoch_tabel.csv
+  TRAINING_PLOT_PATH: artifacts/results/reports/training_plot.png
 
-model_evaluation:
-  confusion_matrix_path: artifacts/results/reports/confusion_matrix_plot.png
-  classification_report_path: artifacts/results/reports/classification_report.txt
+MODEL_EVALUATION:
+  CONFUSION_MATRIX_PATH: artifacts/results/reports/confusion_matrix_plot.png
+  CLASSIFICATION_REPORT_PATH: artifacts/results/reports/classification_report.txt
 
-wandb:
-  project_name: trashnet-adatama-test-01
-  sweep_count: 5
-  sweep_config:
+WANDB:
+  PROJECT_NAME: trashnet-adatama-test-01
+  SWEEP_COUNT: 5
+  SWEEP_CONFIG:
     method: random
     metric:
       name: val_accuracy
@@ -41,6 +41,6 @@ wandb:
       epochs:
         values: [1]
 
-huggingface:
-  repo_id: Anggads01/trashnet-classifier
-  commit_msg: "Upload DenseNet121 model in .keras format"
+HUGGINGFACE:
+  REPO_ID: Anggads01/trashnet-classifier
+  COMMIT_MSG: "Upload DenseNet121 model in .keras format"

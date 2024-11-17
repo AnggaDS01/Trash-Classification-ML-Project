@@ -1,11 +1,8 @@
-import os
-
 from trashnet.constant import *
 from pathlib import Path
-from datetime import datetime
 from trashnet.utils.main_utils import read_yaml, create_directories
 from trashnet.entity.config_entity import (DataIngestionConfig,
-                                           DataTransformationConfig,
+                                           DataPreprocessingConfig,
                                            ModelTrainerConfig,
                                            ModelEvaluationConfig,
                                            ModelPusher,
@@ -21,55 +18,43 @@ class ConfigurationManager:
         self.config = read_yaml(config_filepath)
         self.params = read_yaml(params_filepath)
 
-        create_directories([self.config.artifacts_root_dir])
+        create_directories([self.config.ARTIFACTS_ROOT_DIR])
 
 
     def get_data_ingestion_config(self) -> DataIngestionConfig:
-        config = self.config.data_ingestion
-        create_directories([config.data_ingestion_dir_path])
+        config = self.config.DATA_INGESTION
+        create_directories([config.DATA_INGESTION_DIR_PATH])
 
         data_ingestion_config = DataIngestionConfig(
-            data_ingestion_dir_path = config.data_ingestion_dir_path,
-            data_download_store_dir_path = config.data_download_store_dir_path,
-            zip_file_path = config.zip_file_path,
-            data_download_url = config.data_download_url,
+            data_ingestion_dir_path = Path(config.DATA_INGESTION_DIR_PATH),
+            data_download_store_dir_path = Path(config.DATA_DOWNLOAD_STORE_DIR_PATH),
+            zip_file_path = Path(config.ZIP_FILE_PATH),
+            data_download_url = config.DATA_DOWNLOAD_URL,
         )
 
         return data_ingestion_config
     
 
 
-
-    # def get_data_transformation_config(self) -> DataTransformationConfig:
-    #     data_transformation_dir_path = Path(os.path.join(self.artifacts_config, self.directories_config.DATA_TRANSFORMATION))
-    #     train_tfrecord_data_path = data_transformation_dir_path / self.tfrecords_config.TRAIN_FILE
-    #     valid_tfrecord_data_path = data_transformation_dir_path / self.tfrecords_config.VALID_FILE
+    def get_data_preprocessing_config(self) -> DataPreprocessingConfig:
+        config = self.config.DATA_PREPROCESSING
         
-    #     object_dir_path = Path(os.path.join(self.artifacts_config, self.directories_config.OBJECTS))
-    #     label_list_path = object_dir_path / self.objects_config.LABEL_LIST_FILE
-    #     class_weights_path = object_dir_path / self.objects_config.CLASS_WEIGHTS_FILE
+        create_directories([config.TFRECORDS_DIR_PATH])
+        create_directories([config.OBJECTS_DIR_PATH])
 
-    #     img_ext_regex_pattern = self.data_config.IMAGE_EXTENSION_REGEX
-    #     label_list = self.dataset_params.LABEL_LIST
-    #     split_ratio = self.dataset_params.SPLIT_RATIO
-    #     img_size = self.model_params.IMAGE_SIZE
-    #     seed = self.training_params.SEED
+        data_preprocessing_config = DataPreprocessingConfig(
+            train_tfrecord_file_path = Path(config.TRAIN_TFRECORD_FILE_PATH),
+            valid_tfrecord_file_path = Path(config.VALID_TFRECORD_FILE_PATH),
+            labels_list_file_path = Path(config.LABELS_LIST_FILE_PATH),
+            class_weights_file_path = Path(config.CLASS_WEIGHTS_FILE_PATH),
+            image_extension_regex = config.IMAGE_EXTENSION_REGEX,
+            label_list = self.params.LABEL_LIST,
+            split_ratio = tuple(self.params.SPLIT_RATIO),
+            img_size = self.params.IMAGE_SIZE,
+            seed = self.params.SEED,
+        )
 
-    #     data_transformation_config = DataTransformationConfig(
-    #         data_transformation_dir_path = data_transformation_dir_path,
-    #         train_tfrecord_data_path = train_tfrecord_data_path,
-    #         valid_tfrecord_data_path = valid_tfrecord_data_path,
-    #         object_dir_path = object_dir_path,
-    #         label_list_path = label_list_path,
-    #         class_weights_path = class_weights_path,
-    #         img_ext_regex_pattern = img_ext_regex_pattern,
-    #         label_list = label_list,
-    #         split_ratio = split_ratio,
-    #         img_size = img_size,
-    #         seed = seed
-    #     )
-
-    #     return data_transformation_config
+        return data_preprocessing_config
 
 
 
@@ -162,8 +147,8 @@ class ConfigurationManager:
 
     #     return wandb_config
 
-# if __name__ == '__main__':
-#     config = ConfigurationManager()
-#     get_config = config.get_data_ingestion_config()
+if __name__ == '__main__':
+    config = ConfigurationManager()
+    get_config = config.get_data_preprocessing_config()
 
-#     print(get_config)
+    print(get_config)

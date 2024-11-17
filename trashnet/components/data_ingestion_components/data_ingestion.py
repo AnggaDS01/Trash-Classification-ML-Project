@@ -2,11 +2,11 @@ import sys
 import inspect
 
 from colorama import Fore
-from trashnet.exception import TrashClassificationException
 
 from trashnet.components.data_ingestion_components.utils.download_file import download_zip
 from trashnet.components.data_ingestion_components.utils.extract_file import extract_zip
-
+from trashnet.exception import TrashClassificationException
+from trashnet.entity.config_entity import DataIngestionConfig
 
 from trashnet.utils.main_utils import (display_log_message, 
                                        display_function_info,
@@ -15,7 +15,7 @@ from trashnet.utils.main_utils import (display_log_message,
 class DataIngestion:
     def __init__(
             self, 
-            data_ingestion_config
+            data_ingestion_config: DataIngestionConfig = DataIngestionConfig
         ):
 
         try:
@@ -43,6 +43,7 @@ class DataIngestion:
 
             display_log_message(f"Got the data from URL: {color_text(self.data_ingestion_config.data_download_url, color=Fore.GREEN)}")
             display_log_message(f"Exited {color_text(function_name)} method of {color_text(class_name)} class in {color_text(file_name)}")
+            display_log_message(f"{class_name} config: {color_text(self.data_ingestion_config)}")
 
             return self.data_ingestion_config
 

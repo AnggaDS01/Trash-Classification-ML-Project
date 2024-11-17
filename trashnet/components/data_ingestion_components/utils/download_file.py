@@ -2,7 +2,7 @@ import requests
 import sys
 import logging
 
-from trashnet.utils.main_utils import display_log_message
+from trashnet.utils.main_utils import display_log_message, color_text
 from trashnet.exception import TrashClassificationException
 from tqdm import tqdm
 from pathlib import Path
@@ -37,11 +37,10 @@ def download_zip(
                 file.write(chunk)
                 bar.update(len(chunk))
 
-        display_log_message(f"File downloaded to {save_zip_file_path}", is_log=False)
+        display_log_message(f"File downloaded to {color_text(save_zip_file_path)}")
 
     except requests.exceptions.RequestException as e:
         raise Exception(f"Error downloading the file: {e}")
     
     except Exception as e:
-        logging.info(e)
         raise TrashClassificationException(e, sys)

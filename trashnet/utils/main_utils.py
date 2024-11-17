@@ -127,9 +127,6 @@ def save_object(file_path, obj):
             display_log_message(f"File '{color_text(file_path)}' already exists. Skipping saving.")
             return # Jika sudah ada, tidak perlu menyimpan lagi
 
-        dir_path = os.path.dirname(file_path)  # Mendapatkan jalur direktori dari file
-        os.makedirs(dir_path, exist_ok=True) # Membuat direktori jika belum ada
-
         with open(file_path, 'wb') as file_obj: # Membuka file dalam mode write-binary
             dill.dump(obj, file_obj) # Menyimpan objek menggunakan dill
         print(f"Object saved to {file_path}")
