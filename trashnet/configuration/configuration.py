@@ -58,37 +58,25 @@ class ConfigurationManager:
 
 
 
-    # def get_model_trainer_config(self) -> ModelTrainerConfig:
-    #     model_dir_path =  Path(os.path.join(self.artifacts_config, self.directories_config.MODELS))
-    #     model_path = model_dir_path / (self.model_params.NAME + self.model_config.KERAS_FILE)
+    def get_model_trainer_config(self) -> ModelTrainerConfig:
+        config = self.config.MODEL_TRAINING
+        
+        create_directories([config.MODEL_DIR_PATH])
+        create_directories([config.REPORTS_DIR_PATH])
 
-    #     report_dir_path = Path(os.path.join(self.artifacts_config, self.directories_config.REPORTS))
-    #     training_tabel_path = report_dir_path / self.model_params.NAME / self.reports_config.TRAINING_TABEL
-    #     tabel_epoch_path = report_dir_path / self.model_params.NAME / self.reports_config.EPOCH_TABEL
-    #     plot_training_path = report_dir_path / self.model_params.NAME / self.reports_config.TRAINING_PLOT
+        model_trainer_config = ModelTrainerConfig(
+            model_file_path = Path(config.MODEL_FILE_PATH),
+            training_table_file_path = Path(config.TRAINING_TABLE_FILE_PATH),
+            epoch_table_file_path = Path(config.EPOCH_TABLE_FILE_PATH),
+            training_plot_file_path = Path(config.TRAINING_PLOT_FILE_PATH),
+            batch_size = self.params.BATCH_SIZE,
+            epochs = self.params.EPOCHS,
+            learning_rate = self.params.LEARNING_RATE,
+            loss_function = self.params.LOSS_FUNCTION,
+            metrics = self.params.METRICS,
+        )
 
-    #     batch_size =  self.training_params.BATCH_SIZE
-    #     epochs =  self.training_params.EPOCHS
-    #     learning_rate = self.training_params.LEARNING_RATE
-    #     loss_function = self.training_params.LOSS_FUNCTION
-    #     metrics = self.training_params.METRICS
-
-
-    #     model_trainer_config = ModelTrainerConfig(
-    #         model_dir_path = model_dir_path,
-    #         model_path = model_path,
-    #         report_dir_path = report_dir_path,
-    #         training_tabel_path = training_tabel_path,
-    #         tabel_epoch_path = tabel_epoch_path,
-    #         plot_training_path = plot_training_path,
-    #         batch_size = batch_size,
-    #         epochs = epochs,
-    #         learning_rate = learning_rate,
-    #         loss_function = loss_function,
-    #         metrics = metrics
-    #     )
-
-    #     return model_trainer_config
+        return model_trainer_config
 
 
     # def get_model_evaluation_config(self) -> ModelEvaluationConfig:
@@ -121,34 +109,34 @@ class ConfigurationManager:
     #     return model_evaluation_config
 
 
-    # def get_wandb_config(self) -> WandbConfig:
-    #     config = {
-    #         "learning_rate": self.training_params.LEARNING_RATE,
-    #         "loss_function": self.training_params.LOSS_FUNCTION,
-    #         "metrics": self.training_params.METRICS,
-    #         "batch_size": self.training_params.BATCH_SIZE,
-    #         "epochs": self.training_params.EPOCHS,
-    #         "architecture": self.model_params.NAME,
-    #         "dataset": self.dataset_params.NAME
-    #     }
+    def get_wandb_config(self) -> WandbConfig:
+        config = self.config.WANDB
 
-    #     project = self.wandb_params.PROJECT_NAME
+        config_dicts = {
+            "learning_rate": self.params.LEARNING_RATE,
+            "loss_function": self.params.LOSS_FUNCTION,
+            "metrics": self.params.METRICS,
+            "batch_size": self.params.BATCH_SIZE,
+            "epochs": self.params.EPOCHS,
+            "architecture": self.params.MODEL_NAME,
+            "dataset": self.params.DATASET_NAME
+        }
 
-    #     sweep_config = self.wandb_params.SWEEP_CONFIG
-
-    #     sweep_count = self.wandb_params.SWEEP_COUNT
+        project = config.PROJECT_NAME
+        sweep_config = config.SWEEP_CONFIG
+        sweep_count = config.SWEEP_COUNT
         
-    #     wandb_config = WandbConfig(
-    #         config = config,
-    #         project = project,
-    #         sweep_config = sweep_config,
-    #         sweep_count = sweep_count
-    #     )
+        wandb_config = WandbConfig(
+            project_name = project,
+            config = config_dicts,
+            sweep_config = sweep_config,
+            sweep_count = sweep_count
+        )
 
-    #     return wandb_config
+        return wandb_config
 
-if __name__ == '__main__':
-    config = ConfigurationManager()
-    get_config = config.get_data_preprocessing_config()
+# if __name__ == '__main__':
+#     config = ConfigurationManager()
+#     get_config = config.get_model_trainer_config()
 
-    print(get_config)
+#     print(get_config)

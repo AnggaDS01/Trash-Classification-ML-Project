@@ -22,12 +22,10 @@ class DataPreprocessingConfig:
 
 @dataclass
 class ModelTrainerConfig:
-    model_dir_path: Path 
-    model_path: Path
-    report_dir_path: Path 
-    training_tabel_path: Path
-    tabel_epoch_path: Path
-    plot_training_path: Path
+    model_file_path: Path
+    training_table_file_path: Path
+    epoch_table_file_path: Path
+    training_plot_file_path: Path
     batch_size: int
     epochs: int
     learning_rate: float
@@ -49,7 +47,7 @@ class ModelPusher:
 
 @dataclass
 class WandbConfig:
-    project: str
+    project_name: str
     config: dict
     sweep_config: dict
     sweep_count: int

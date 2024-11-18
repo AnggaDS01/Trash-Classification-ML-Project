@@ -4,14 +4,14 @@ import tensorflow as tf
 import numpy as np
 import random
 
-from trashnet.components.data_preprocessing_components.utils.collect_images_paths import collect_and_combine_images
-from trashnet.components.data_preprocessing_components.utils.calculate_distribution_class import calculate_class_distribution_tf
-from trashnet.components.data_preprocessing_components.utils.display_distribution_class import print_class_distribution
-from trashnet.components.data_preprocessing_components.utils.create_label_list_table import create_label_list_table
 from trashnet.components.data_preprocessing_components.utils.split_data import DatasetSplitter
 from trashnet.components.data_preprocessing_components.utils.display_filepath_info import FilePathInfo
 from trashnet.components.data_preprocessing_components.utils.image_processor import ImagePreprocessor
 from trashnet.exception import TrashClassificationException
+from trashnet.components.data_preprocessing_components.utils.collect_images_paths import collect_and_combine_images
+from trashnet.components.data_preprocessing_components.utils.calculate_distribution_class import calculate_class_distribution_tf
+from trashnet.components.data_preprocessing_components.utils.display_distribution_class import print_class_distribution
+from trashnet.components.data_preprocessing_components.utils.create_label_list_table import create_label_list_table
 
 from trashnet.utils.main_utils import (display_log_message, 
                                        display_function_info,
@@ -37,14 +37,33 @@ class DataPreprocessing:
            raise TrashClassificationException(e, sys)
 
     def initiate_data_preprocessing(self):
-        tf.random.set_seed(self.data_preprocessing_config.seed)
-        np.random.seed(self.data_preprocessing_config.seed)
-        random.seed(self.data_preprocessing_config.seed)
+        """
+        This method initiates the data preprocessing process.
+
+        The method includes the following steps:
+
+        1. Collecting images from the data download store directory
+        2. Converting the image paths to a tf dataset
+        3. Splitting the data into train and validation datasets
+        4. Calculating the class distribution for the train and validation datasets
+        5. Creating a label list table
+        6. Converting the image paths to images
+        7. Resizing the images
+        8. Normalizing the images
+        9. Augmenting the images
+        10. Saving the train and validation datasets to tfrecord files
+        11. Saving the class weights and label list to files
+
+        Returns:
+            DataPreprocessingConfig: The configuration used for the data preprocessing.
+        """
 
         try: 
+            tf.random.set_seed(self.data_preprocessing_config.seed)
+            np.random.seed(self.data_preprocessing_config.seed)
+            random.seed(self.data_preprocessing_config.seed)
             function_name, class_name, file_name = display_function_info(inspect.currentframe())
             display_log_message(f"Entered {color_text(function_name)} method of {color_text(class_name)} class in {color_text(file_name)}")
-        
             display_log_message(f"Collecting images from {color_text(str(self.data_ingestion_config.data_download_store_dir_path))}")
             all_images_paths = collect_and_combine_images(
                 classes = self.data_preprocessing_config.label_list,

@@ -11,13 +11,7 @@ from tqdm import tqdm
 from sklearn.metrics import confusion_matrix, classification_report
 from trashnet.utils.main_utils import custom_title_print
 
-def display_info_dataset_batched(batch_size, dataset, dataset_batched, kind):
-    custom_title_print(f' {kind} ')
-    print(f"Info data: {dataset_batched}")
-    print(f"Number of data: {len(dataset)}")
-    if not re.search('test', kind.lower(), re.IGNORECASE):
-        print(f"AFTER BATCH: {batch_size}")
-        print(f"Number of data: {len(dataset_batched)}")
+
 
 
 def training_logger_callback(log_file, batch_size):
@@ -101,9 +95,6 @@ def plot_training_history(history, save_path):
     plt.title('Training and Validation Loss')
     plt.legend()
 
-    # Buat direktori jika belum ada, lalu simpan plot
-    dir_path = os.path.dirname(save_path)
-    os.makedirs(dir_path, exist_ok=True)
     plt.savefig(save_path)
 
 
@@ -122,7 +113,6 @@ class TrainingLogger(tf.keras.callbacks.Callback):
 
         # Membuat file CSV dan menulis header-nya jika belum ada
         if not os.path.exists(log_file):
-            os.makedirs(os.path.dirname(self.log_file), exist_ok=True)
             with open(log_file, mode='w', newline='') as file:
                 writer = csv.writer(file)
                 writer.writerow(["Epoch", "Batch Size", "val_acc (%)", "val_loss (%)"])
