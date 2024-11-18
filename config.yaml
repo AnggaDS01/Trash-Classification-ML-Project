@@ -31,7 +31,7 @@ WANDB:
   PROJECT_NAME: trashnet-adatama-test-01
   SWEEP_COUNT: 5
   SWEEP_CONFIG:
-    method: bayes
+    method: grid
     metric:
       name: val_accuracy
       goal: maximize
@@ -44,5 +44,6 @@ WANDB:
         values: [1]
 
 HUGGINGFACE:
+  MODEL_FILE_PATH: DenseNet121_03.keras
   REPO_ID: Anggads01/trashnet-classifier
   COMMIT_MSG: "Upload best model in .keras format"

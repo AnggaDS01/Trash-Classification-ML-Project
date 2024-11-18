@@ -8,16 +8,16 @@ from trashnet.components.model_evaluation_components.utils.evaluate_model import
 from trashnet.utils.main_utils import (display_log_message, 
                                        display_function_info,
                                        color_text,
-                                       load_object,
-                                       custom_title_print)
+                                       load_object)
 
+from trashnet.entity.config_entity import (DataPreprocessingConfig, ModelTrainerConfig, ModelEvaluationConfig)
 
 class ModelEvaluation:
     def __init__(
             self,
-            data_preprocessing_config, 
-            model_trainer_config,
-            model_evaluation_config,
+            data_preprocessing_config: DataPreprocessingConfig = DataPreprocessingConfig, 
+            model_trainer_config: ModelTrainerConfig = ModelTrainerConfig,
+            model_evaluation_config: ModelEvaluationConfig = ModelEvaluationConfig,
             # wandb_config
         ):
 
@@ -33,7 +33,6 @@ class ModelEvaluation:
 
         try:
             function_name, class_name, file_name = display_function_info(inspect.currentframe())
-            custom_title_print(f'{class_name}')
             display_log_message(f"Started {color_text(function_name)} method of {color_text(class_name)} class in {color_text(file_name)}")
 
             display_log_message(f"Loading label list from file: {color_text(self.data_preprocessing_config.labels_list_file_path)}")

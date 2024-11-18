@@ -7,7 +7,7 @@ from trashnet.components.data_ingestion_components.data_ingestion import DataIng
 from trashnet.components.data_preprocessing_components.data_preprocessing import DataPreprocessing
 from trashnet.components.model_trainer_components.model_trainer import ModelTrainer
 from trashnet.components.model_evaluation_components.model_evaluation import ModelEvaluation
-# from trashnet.components.model_pusher import ModelPusher
+from trashnet.components.model_pusher_components.model_pusher import ModelPusher
 
 from trashnet.entity.config_entity import (DataIngestionConfig, 
                                            DataPreprocessingConfig,
@@ -16,8 +16,7 @@ from trashnet.entity.config_entity import (DataIngestionConfig,
 
 from trashnet.utils.main_utils import (display_log_message, 
                                        display_function_info,
-                                       color_text,
-                                       custom_title_print)
+                                       color_text)
 
 class TrainPipeline:
     def __init__(self):
@@ -26,7 +25,7 @@ class TrainPipeline:
         self.data_preprocessing_config = config.get_data_preprocessing_config()
         self.model_trainer_config = config.get_model_trainer_config()
         self.model_evaluation_config = config.get_model_evaluation_config()
-        # self.model_pusher_config = config.get_model_pusher_config()
+        self.model_pusher_config = config.get_model_pusher_config()
         self.wandb_config = config.get_wandb_config()
 
     
@@ -120,28 +119,25 @@ class TrainPipeline:
             raise TrashClassificationException(e, sys)
         
 
-    # def start_model_pusher(
-    #         self,
-    #         model_trainer_config,
-    #     ):
-    #     try:
-    #         function_name, file_name_function = display_function_name(inspect.currentframe())
-    #         display_log_message(f"Started the {color_text(function_name)} method of {color_text('TrainPipeline')} class in {color_text(file_name_function)}")
+    def start_model_pusher(
+            self,
+            model_trainer_config: ModelTrainerConfig,
+        ) -> None:
+        try:
+            function_name, class_name, file_name = display_function_info(inspect.currentframe())
+            display_log_message(f"Started {color_text(function_name)} method of {color_text(class_name)} class in {color_text(file_name)}")
 
-    #         model_pusher = ModelPusher(
-    #             model_trainer_config = model_trainer_config,
-    #             model_pusher_config = self.model_pusher_config,
-    #         )
+            model_pusher = ModelPusher(
+                model_trainer_config = model_trainer_config,
+                model_pusher_config = self.model_pusher_config,
+            )
 
-    #         model_pusher.initiate_model_pusher()
+            model_pusher.initiate_model_pusher()
 
-    #         display_log_message(f"Exited the {color_text(function_name)} method of {color_text('TrainPipeline')} class in {color_text(file_name_function)}\n\n")
+            display_log_message(f"Finished {color_text(function_name)} method of {color_text(class_name)} class in {color_text(file_name)}\n\n")
 
-    #         return model_trainer_config
-
-    #     except Exception as e:
-    #         raise TrashClassificationException(e, sys)
-        
+        except Exception as e:
+            raise TrashClassificationException(e, sys)
         
 
     def run_pipeline(self) -> None:
@@ -150,7 +146,7 @@ class TrainPipeline:
             data_preprocessing_config = self.start_data_preprocessing(data_ingestion_config)
             model_trainer_config = self.start_model_trainer(data_preprocessing_config)
             self.start_model_evaluation(data_preprocessing_config, model_trainer_config)
-            # self.start_model_pusher(model_trainer_config)
+            self.start_model_pusher(model_trainer_config)
 
             return 
 

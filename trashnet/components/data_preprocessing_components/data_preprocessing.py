@@ -13,6 +13,8 @@ from trashnet.components.data_preprocessing_components.utils.calculate_distribut
 from trashnet.components.data_preprocessing_components.utils.display_distribution_class import print_class_distribution
 from trashnet.components.data_preprocessing_components.utils.create_label_list_table import create_label_list_table
 
+from trashnet.entity.config_entity import (DataIngestionConfig, DataPreprocessingConfig)
+
 from trashnet.utils.main_utils import (display_log_message, 
                                        display_function_info,
                                        color_text,
@@ -25,8 +27,8 @@ from trashnet.utils.main_utils import (display_log_message,
 class DataPreprocessing:
     def __init__(
             self, 
-            data_ingestion_config,
-            data_preprocessing_config
+            data_ingestion_config: DataIngestionConfig = DataIngestionConfig,
+            data_preprocessing_config: DataPreprocessingConfig = DataPreprocessingConfig
         ):
         
         try:

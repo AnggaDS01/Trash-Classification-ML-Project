@@ -12,7 +12,8 @@ class CallbacksManager:
             batch_size: int = None, 
             model_path: str = None, 
             validation_data: tf.data.Dataset = None, 
-            label_list: list = None
+            label_list: list = None,
+            sample_count: int = 10
         ):
 
         self.log_file = log_file
@@ -20,6 +21,7 @@ class CallbacksManager:
         self.model_path = model_path
         self.validation_data = validation_data
         self.label_list = label_list
+        self.sample_count = sample_count
 
     def training_logger_callback(self):
         """
@@ -93,7 +95,7 @@ class CallbacksManager:
         return WandbImageLogger(
             validation_data=self.validation_data,
             label_list=self.label_list,
-            sample_count=10
+            sample_count=self.sample_count
         )
 
     def get_callbacks(self):

@@ -46,18 +46,19 @@ class PredictionPipeline:
     def run_pipeline(
             self, 
             img_path=None,
-            augment=None
+            augment=False
         ) -> None:
 
         try:
             prediction_result = self.start_prediction(img_path, augment)
             return prediction_result
+        
         except Exception as e:
             raise TrashClassificationException(e, sys)
         
         
 if __name__ == "__main__":
-    img_path = 'artifacts/data_ingestion/dataset-resized/cardboard/cardboard20.jpg'
+    img_path = 'artifacts/DenseNet121/data_ingestion/dataset-resized/cardboard/cardboard1.jpg'
     image = Image.open(img_path) 
     
     prediction_pipeline = PredictionPipeline()

@@ -136,7 +136,8 @@ class ModelTrainer:
                 batch_size=config.batch_size,
                 model_path=self.model_trainer_config.model_file_path,
                 validation_data=valid_tf_images_batched,
-                label_list=label_list
+                label_list=label_list,
+                sample_count=10
             )
             callbacks = callbacks_manager.get_callbacks()
 

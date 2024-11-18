@@ -5,7 +5,7 @@ from trashnet.entity.config_entity import (DataIngestionConfig,
                                            DataPreprocessingConfig,
                                            ModelTrainerConfig,
                                            ModelEvaluationConfig,
-                                           ModelPusher,
+                                           ModelPusherConfig,
                                            WandbConfig)
 
 
@@ -91,16 +91,16 @@ class ConfigurationManager:
 
         return model_evaluation_config
 
-    # def get_model_pusher_config(self) -> ModelPusher:
-    #     repo_id = self.huggingface_config.REPO_ID
-    #     commit_msg = self.huggingface_config.COMMIT_MSG
+    def get_model_pusher_config(self) -> ModelPusherConfig:
+        config = self.config.HUGGINGFACE
 
-    #     model_evaluation_config = ModelPusher(
-    #         repo_id= repo_id,
-    #         commit_msg= commit_msg
-    #     )
+        model_evaluation_config = ModelPusherConfig(
+            model_file_path = config.MODEL_FILE_PATH,
+            repo_id = config.REPO_ID,
+            commit_msg = config.COMMIT_MSG
+        )
 
-    #     return model_evaluation_config
+        return model_evaluation_config
 
 
     def get_wandb_config(self) -> WandbConfig:

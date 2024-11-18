@@ -40,7 +40,8 @@ class ModelEvaluationConfig:
     figsize: tuple
 
 @dataclass
-class ModelPusher:
+class ModelPusherConfig:
+    model_file_path: Path
     repo_id: str
     commit_msg: str
 

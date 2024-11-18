@@ -9,65 +9,107 @@ import numpy as np
 from pathlib import Path
 from box import ConfigBox
 from box.exceptions import BoxValueError
-from colorama import init, Fore, Back, Style
 from colorama import Fore, Style
 from trashnet.logger import logging
 from trashnet.exception import TrashClassificationException
 
-def color_text(text, color=Fore.YELLOW, reset=True):
+def color_text(
+        text: str = None, 
+        color: str = Fore.YELLOW, 
+        reset: bool = True
+    ) -> str:
     """
-    Function to change the text color according to the color parameter.
-    
-    Parameters:
-    text (str): The text to be colored.
-    color (str): The color to apply, default is yellow.
-    reset (bool): Sets whether the color will be reset back to default after the text, default is True.
-    Returns:
-    str: The text that has been colored.
-    """
-
-    colored_text = f"{color}{text}{Style.RESET_ALL}" if reset else f"{color}{text}"
-    return colored_text
-
-def remove_color_codes(text):
-    """
-    Remove color codes (ANSI escape codes) from text.
-    
-    Parameters:
-    text (str): Text that may contain color codes.
-    
-    Returns:
-    str: Text without color coding.
-    """
-
-    ansi_escape = re.compile(r'\x1b\[[0-9;]*m')
-    return ansi_escape.sub('', text)
-
-def show_data_info(**datasets):
-    """
-    Menampilkan informasi detail tentang dataset yang diberikan.
+    Color the given text with the specified ANSI color code.
 
     Args:
-        **datasets: Satu atau lebih dataset yang ingin ditampilkan informasi.
+        text (str): The text to color.
+        color (str): ANSI color code to apply. Defaults to yellow.
+        reset (bool): Flag to reset color after the text. Defaults to True.
+
+    Returns:
+        str: The colored text.
+    
+    Raises:
+        TrashClassificationException: If an error occurs during text coloring.
     """
-
     try:
-        for dataset_name, dataset in datasets.items():
-            custom_title_print(f"{dataset_name} info")
-            print(f'info {dataset_name}: {dataset}')
-            print(f'number of {dataset_name}: {len(dataset)}')
-            print()
-    except Exception as e:
-        print(f'''
-            explicitly input parameter names such as:
-            show_data_info(train_dataset=train_ds, valid_dataset=valid_ds)
-        ''')
+        # Construct colored text with or without reset based on the flag
+        colored_text = f"{color}{text}{Style.RESET_ALL}" if reset else f"{color}{text}"
+        return colored_text
 
-def display_log_message(msg, is_log=True):
-    print(f"{color_text('[INFO]', color=Fore.GREEN)} {msg}")
-    if is_log:
-        msg_no_color = remove_color_codes(msg)
-        logging.info(msg_no_color)
+    except Exception as e:
+        # Raise custom exception with traceback details
+        raise TrashClassificationException(e, sys)
+
+def remove_color_codes(text: str = None) -> str:
+    """
+    Remove ANSI color codes from the given text.
+
+    Args:
+        text (str): The text from which ANSI color codes should be removed.
+
+    Returns:
+        str: The text without ANSI color codes.
+    """
+    try:
+        # Regular expression to match ANSI escape sequences
+        ansi_escape = re.compile(r'\x1b\[[0-9;]*m')
+        
+        # Remove ANSI escape sequences from the text
+        return ansi_escape.sub('', text)
+    
+    except Exception as e:
+        raise TrashClassificationException(e, sys)
+
+def show_data_info(**datasets) -> None:
+    """
+    Function to display information about the given datasets.
+
+    Args:
+        **datasets (dict): A dictionary of datasets to be displayed.
+
+    Raises:
+        TrashClassificationException: If an exception occurs while displaying the dataset information.
+    """
+    try:
+        # Iterate over the given datasets
+        for dataset_name, dataset in datasets.items():
+            # Print the title of the dataset
+            custom_title_print(f"{dataset_name} info")
+            # Print the information of the dataset
+            print(f'info {dataset_name}: {dataset}')
+            # Print the number of elements in the dataset
+            print(f'number of {dataset_name}: {len(dataset)}')
+            # Print a newline for better readability
+            print()
+
+    except Exception as e:
+        raise TrashClassificationException(e, sys)
+
+def display_log_message(msg, is_log=True) -> None:
+    """
+    Function to print a message to the console and log it to the log file.
+
+    Args:
+        msg (str): The message to be printed and logged.
+        is_log (bool): A flag indicating whether the message should be logged or not.
+
+    Raises:
+        TrashClassificationException: If an exception occurs while displaying the message.
+    """
+    try:
+        # Print the message to the console
+        print(f"{color_text('[INFO]', color=Fore.GREEN)} {msg}")
+        # If is_log is True, log the message to the log file
+        if is_log:
+            # Remove ANSI escape sequences from the message
+            msg_no_color = remove_color_codes(msg)
+            # Log the message
+            logging.info(msg_no_color)
+
+    except Exception as e:
+        # Raise an exception if any error occurs
+        raise TrashClassificationException(e, sys)
 
 def display_function_info(frame) -> tuple:
     """
@@ -82,17 +124,25 @@ def display_function_info(frame) -> tuple:
         tuple: A tuple containing the function name, class name 
                (or None if not in a class), and file name.
     """
-    # Retrieve the function's name and the file in which it is defined
-    function_name = frame.f_code.co_name
-    file_name = inspect.getfile(frame)
-    
-    # Check if there is a class context and retrieve class name if exists
-    class_name = frame.f_locals.get('self')
-    class_name = class_name.__class__.__name__ if class_name else None
-    
-    return function_name, class_name, file_name
+    try:
+        # Retrieve the function's name and the file in which it is defined
+        function_name = frame.f_code.co_name
+        file_name = inspect.getfile(frame)
+        
+        # Check if there is a class context and retrieve class name if exists
+        class_name = frame.f_locals.get('self')
+        class_name = class_name.__class__.__name__ if class_name else None
+        
+        return function_name, class_name, file_name
 
-def custom_title_print(title, n_strip=110):
+    except Exception as e:
+        raise TrashClassificationException(e, sys)
+
+def custom_title_print(
+        title: str='Title', 
+        n_strip: int=110
+    ) -> None:
+
     """
     Mencetak judul yang disesuaikan dengan garis pembatas di atas dan di bawah judul.
 
@@ -104,13 +154,21 @@ def custom_title_print(title, n_strip=110):
         None
     """
 
-    title = f'''{'=' * n_strip}
-{title.upper().center(n_strip, '=')}
-{'=' * n_strip}'''
+    try:
+        title = f'''{'=' * n_strip}
+    {title.upper().center(n_strip, '=')}
+    {'=' * n_strip}'''
 
-    print(title)
+        print(title)
 
-def save_object(file_path, obj):
+    except Exception as e:
+        raise TrashClassificationException(e, sys)
+
+def save_object(
+        file_path: str=None, 
+        obj: object=None
+    ) -> None:
+
     """
     Menyimpan objek ke dalam file menggunakan serialisasi dengan dill.
 
@@ -134,7 +192,7 @@ def save_object(file_path, obj):
     except Exception as e:
         raise TrashClassificationException(e, sys)
     
-def load_object(file_path):
+def load_object(file_path: str=None) -> object:
     """
     Fungsi untuk memuat objek dari file dengan menggunakan modul `dill`.
 
@@ -151,8 +209,10 @@ def load_object(file_path):
     except FileNotFoundError:
         print(f"File not found: {file_path}")
         return None
+    except Exception as e:
+        raise TrashClassificationException(e, sys)
 
-def read_yaml(path_to_yaml: Path) -> ConfigBox:
+def read_yaml(path_to_yaml: Path=None) -> ConfigBox:
     """reads yaml file and returns
 
     Args:
@@ -172,19 +232,28 @@ def read_yaml(path_to_yaml: Path) -> ConfigBox:
     except BoxValueError:
         raise ValueError("yaml file is empty")
     except Exception as e:
-        raise e
+        raise TrashClassificationException(e, sys)
 
-def create_directories(path_to_directories: list, verbose=True):
+def create_directories(
+        path_to_directories: list=[], 
+        verbose: bool=True
+    ) -> None:
+
     """create list of directories
 
     Args:
         path_to_directories (list): list of path of directories
         ignore_log (bool, optional): ignore if multiple dirs is to be created. Defaults to False.
     """
-    for path in path_to_directories:
-        os.makedirs(path, exist_ok=True)
-        if verbose:
-            display_log_message(f"created directory at: {color_text(path)}")
+    try:
+        for path in path_to_directories:
+            os.makedirs(path, exist_ok=True)
+            if verbose:
+                display_log_message(f"created directory at: {color_text(path)}")
+
+    except Exception as e:
+        raise TrashClassificationException(e, sys)
+
 
 class DataInspector:
     """
