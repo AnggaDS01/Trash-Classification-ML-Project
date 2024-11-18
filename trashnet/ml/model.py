@@ -2,9 +2,9 @@ import tensorflow as tf
 
 
 def build_model(
-      input_shape=None,
-      num_classes=None,
-      pretrained_model=None,
+      input_shape: tuple=None,
+      num_classes: list=None,
+      pretrained_model: tf.keras.Model=None,
     ) -> tf.keras.Model:
     # Input layer
     input_layer = tf.keras.Input(shape=input_shape)

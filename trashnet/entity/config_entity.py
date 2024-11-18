@@ -34,9 +34,9 @@ class ModelTrainerConfig:
 
 @dataclass
 class ModelEvaluationConfig:
-    plot_confusion_matrix_path: Path
-    classification_report_path: Path
-    normalize: bool
+    plot_confusion_matrix_file_path: Path
+    classification_report_file_path: Path
+    normalize_confusion_matrix: bool
     figsize: tuple
 
 @dataclass

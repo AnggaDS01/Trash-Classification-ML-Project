@@ -146,8 +146,8 @@ class ModelTrainer:
                 epochs=config.epochs,
                 class_weight=class_weights,
                 callbacks=[
+                    *callbacks,
                     WandbMetricsLogger(),
-                    *callbacks
                 ]
             )
 
@@ -166,7 +166,7 @@ class ModelTrainer:
             history_df.to_csv(self.model_trainer_config.epoch_table_file_path, index=False)
 
             # Finish W&B
-            wandb.finish()
+            # wandb.finish()
 
             # Save plot of training history
             display_log_message(f"Saving plot training history")

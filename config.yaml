@@ -24,8 +24,8 @@ MODEL_TRAINING:
   TRAINING_PLOT_FILE_PATH: artifacts/DenseNet121/results/reports/training_plot.png
 
 MODEL_EVALUATION:
-  CONFUSION_MATRIX_PATH: artifacts/DenseNet121/results/reports/confusion_matrix_plot.png
-  CLASSIFICATION_REPORT_PATH: artifacts/DenseNet121/results/reports/classification_report.txt
+  CONFUSION_MATRIX_FILE_PATH: artifacts/DenseNet121/results/reports/confusion_matrix_plot.png
+  CLASSIFICATION_REPORT_FILE_PATH: artifacts/DenseNet121/results/reports/classification_report.txt
 
 WANDB:
   PROJECT_NAME: trashnet-adatama-test-01

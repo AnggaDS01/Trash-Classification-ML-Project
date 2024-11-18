@@ -104,11 +104,11 @@ class CallbacksManager:
         - list: A list of initialized callbacks based on the available parameters.
         """
         callbacks = [
+            self.wandb_logger_callback(),
             self.training_logger_callback(),
             self.plateau_callback(),
             self.checkpoint_callback(),
             self.early_stopping_callback(),
-            self.wandb_logger_callback()
         ]
         return callbacks
 
@@ -182,7 +182,6 @@ class WandbImageLogger(tf.keras.callbacks.Callback):
             # Plot the image with the true and predicted labels as title
             plt.figure()
             plt.imshow(random_images[i].numpy())
-            plt.title(f"True: {true_label}, Pred: {predicted_label}")
 
             # Append the image to the list with WandB caption
             wandb_images.append(wandb.Image(plt, caption=f"True: {true_label}, Pred: {predicted_label}"))

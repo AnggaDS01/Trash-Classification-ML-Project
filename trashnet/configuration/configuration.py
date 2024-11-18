@@ -79,23 +79,17 @@ class ConfigurationManager:
         return model_trainer_config
 
 
-    # def get_model_evaluation_config(self) -> ModelEvaluationConfig:
-    #     report_dir_path = Path(os.path.join(self.artifacts_config, self.directories_config.REPORTS))
+    def get_model_evaluation_config(self) -> ModelEvaluationConfig:
+        config = self.config.MODEL_EVALUATION
 
-    #     plot_confusion_matrix_path = report_dir_path / self.model_params.NAME / self.reports_config.CONFUSION_MATRIX_PLOT
-    #     classification_report_path = report_dir_path / self.model_params.NAME / self.reports_config.CLASSIFICATION_REPORT
+        model_evaluation_config = ModelEvaluationConfig(
+            plot_confusion_matrix_file_path = config.CONFUSION_MATRIX_FILE_PATH,
+            classification_report_file_path = config.CLASSIFICATION_REPORT_FILE_PATH,
+            normalize_confusion_matrix = self.params.NORMALIZE_CONFUSION_MATRIX,
+            figsize = self.params.FIGSIZE,
+        )
 
-    #     normalize = self.evaluation_params.NORMALIZE_CONFUSION_MATRIX
-    #     figsize = tuple(self.evaluation_params.FIGSIZE)
-
-    #     model_evaluation_config = ModelEvaluationConfig(
-    #         plot_confusion_matrix_path = plot_confusion_matrix_path,
-    #         classification_report_path = classification_report_path,
-    #         normalize = normalize,
-    #         figsize = figsize
-    #     )
-
-    #     return model_evaluation_config
+        return model_evaluation_config
 
     # def get_model_pusher_config(self) -> ModelPusher:
     #     repo_id = self.huggingface_config.REPO_ID
@@ -137,6 +131,6 @@ class ConfigurationManager:
 
 # if __name__ == '__main__':
 #     config = ConfigurationManager()
-#     get_config = config.get_model_trainer_config()
+#     get_config = config.get_model_evaluation_config()
 
 #     print(get_config)
