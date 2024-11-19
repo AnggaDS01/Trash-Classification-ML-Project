@@ -140,20 +140,36 @@ class TrainPipeline:
             raise TrashClassificationException(e, sys)
         
 
-    def run_pipeline(self) -> None:
+    def run_pipeline(self, stage=None) -> None:
         try:
-            data_ingestion_config = self.start_data_ingestion()
-            data_preprocessing_config = self.start_data_preprocessing(data_ingestion_config)
-            model_trainer_config = self.start_model_trainer(data_preprocessing_config)
-            self.start_model_evaluation(data_preprocessing_config, model_trainer_config)
-            self.start_model_pusher(model_trainer_config)
+            if stage == "data_ingestion":
+                self.start_data_ingestion()
+                
+            elif stage == "data_preprocessing":
+                self.start_data_preprocessing(self.data_ingestion_config)
 
-            return 
+            elif stage == "model_training_and_evaluation":
+                self.start_model_trainer(self.data_preprocessing_config)
+                self.start_model_evaluation(self.data_preprocessing_config, self.model_trainer_config)
+
+            elif stage == "model_pusher":
+                self.start_model_pusher(self.model_trainer_config)
+
+            elif stage is None:
+                self.start_data_ingestion()
+                self.start_data_preprocessing(self.data_ingestion_config)
+                self.start_model_trainer(self.data_preprocessing_config)
+                self.start_model_evaluation(self.data_preprocessing_config, self.model_trainer_config)
+                self.start_model_pusher(self.model_trainer_config)
+                display_log_message("Pipeline selesai.")
+            else:
+                print(f"Unknown stage: {stage}")
 
         except Exception as e:
             raise TrashClassificationException(e, sys)
         
 
 if __name__ == "__main__":
+    stage = sys.argv[1] if len(sys.argv) > 1 else None
     train_pipeline = TrainPipeline()
-    train_pipeline.run_pipeline()
+    train_pipeline.run_pipeline(stage)

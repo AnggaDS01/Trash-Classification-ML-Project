@@ -1,0 +1,55 @@
+stages:
+  data_ingestion:
+    cmd: python trashnet/pipeline/training_pipeline.py data_ingestion
+    deps:
+      - trashnet/pipeline/training_pipeline.py
+      - config.yaml
+    outs:
+      - artifacts/DenseNet121/data_ingestion/dataset-resized
+
+  data_preprocessing:
+    cmd: python trashnet/pipeline/training_pipeline.py data_preprocessing
+    deps:
+      - trashnet/pipeline/training_pipeline.py
+      - config.yaml
+      - artifacts/DenseNet121/data_ingestion/dataset-resized
+    params:
+      - LABEL_LIST
+      - SPLIT_RATIO
+      - IMAGE_SIZE
+      - SEED
+    outs:
+      - artifacts/DenseNet121/data_preprocessing/tfrecords/train_trashnet.tfrecord
+      - artifacts/DenseNet121/data_preprocessing/tfrecords/valid_trashnet.tfrecord
+      - artifacts/DenseNet121/data_preprocessing/objects/label_list.pkl
+      - artifacts/DenseNet121/data_preprocessing/objects/class_weights.pkl
+
+  model_training_and_evaluation:
+    cmd: python trashnet/pipeline/training_pipeline.py model_training_and_evaluation
+    deps:
+      - trashnet/pipeline/training_pipeline.py
+      - config.yaml
+      - artifacts/DenseNet121/data_preprocessing/tfrecords/train_trashnet.tfrecord
+      - artifacts/DenseNet121/data_preprocessing/tfrecords/valid_trashnet.tfrecord
+      - artifacts/DenseNet121/data_preprocessing/objects/label_list.pkl
+      - artifacts/DenseNet121/data_preprocessing/objects/class_weights.pkl
+    params:
+      - BATCH_SIZE
+      - EPOCHS
+      - LEARNING_RATE
+      - LOSS_FUNCTION
+      - METRICS
+    outs:
+      - artifacts/DenseNet121/results/model/best_model.keras
+      - artifacts/DenseNet121/results/reports/training_tabel.csv
+      - artifacts/DenseNet121/results/reports/epoch_tabel.csv
+      - artifacts/DenseNet121/results/reports/training_plot.png
+      - artifacts/DenseNet121/results/reports/confusion_matrix_plot.png
+      - artifacts/DenseNet121/results/reports/classification_report.txt
+
+  model_pusher:
+    cmd: python trashnet/pipeline/training_pipeline.py model_pusher
+    deps:
+      - trashnet/pipeline/training_pipeline.py
+      - config.yaml
+      - artifacts/DenseNet121/results/model/best_model.keras

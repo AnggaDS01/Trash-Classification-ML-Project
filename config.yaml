@@ -8,8 +8,8 @@ DATA_INGESTION:
 
 DATA_PREPROCESSING:
   TFRECORDS_DIR_PATH: artifacts/DenseNet121/data_preprocessing/tfrecord
-  TRAIN_TFRECORD_FILE_PATH: artifacts/DenseNet121/data_preprocessing/train_trashnet.tfrecord
-  VALID_TFRECORD_FILE_PATH: artifacts/DenseNet121/data_preprocessing/valid_trashnet.tfrecord
+  TRAIN_TFRECORD_FILE_PATH: artifacts/DenseNet121/data_preprocessing/tfrecords/train_trashnet.tfrecord
+  VALID_TFRECORD_FILE_PATH: artifacts/DenseNet121/data_preprocessing/tfrecords/valid_trashnet.tfrecord
   OBJECTS_DIR_PATH: artifacts/DenseNet121/data_preprocessing/objects
   LABELS_LIST_FILE_PATH: artifacts/DenseNet121/data_preprocessing/objects/label_list.pkl
   CLASS_WEIGHTS_FILE_PATH: artifacts/DenseNet121/data_preprocessing/objects/class_weights.pkl
@@ -44,6 +44,6 @@ WANDB:
         values: [1]
 
 HUGGINGFACE:
-  MODEL_FILE_PATH: DenseNet121_03.keras
+  MODEL_FILE_PATH: best_model.keras
   REPO_ID: Anggads01/trashnet-classifier
   COMMIT_MSG: "Upload best model in .keras format"
