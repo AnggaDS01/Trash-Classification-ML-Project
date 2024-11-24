@@ -163,31 +163,39 @@ class WandbImageLogger(tf.keras.callbacks.Callback):
         self.sample_count = sample_count
 
     def on_epoch_end(self, epoch, logs=None):
-        # Retrieve a batch of images and labels from the validation dataset
+        """
+        Called at the end of each epoch during training.
+
+        Logs sample images with true and predicted labels to Weights & Biases.
+
+        Args:
+            epoch (int): The current epoch index.
+            logs (dict): Contains metrics like loss and accuracy.
+        """
+        # Get a batch of images and labels from the validation dataset
         images, labels = next(iter(self.validation_data))
-        total_samples = tf.shape(images)[0]
 
-        # Randomly select a subset of samples
-        random_indices = tf.random.shuffle(tf.range(total_samples))[:self.sample_count]
-        random_images = tf.gather(images, random_indices)
-        random_labels = tf.gather(labels, random_indices)
+        # Select a subset of images and labels for logging
+        sample_images = images[:self.sample_count]
+        sample_labels = labels[:self.sample_count]
 
-        # Predict the labels for the randomly selected images
-        predictions = self.model.predict(random_images)
+        # Generate predictions for the sample images
+        predictions = self.model.predict(sample_images)
 
         wandb_images = []
         for i in range(self.sample_count):
-            # Get the true and predicted labels for each image
-            true_label = self.label_list[random_labels[i].numpy()]
+            # Get the true and predicted labels for each sample
+            true_label = self.label_list[sample_labels[i].numpy()]
             predicted_label = self.label_list[np.argmax(predictions[i])]
 
-            # Plot the image with the true and predicted labels as title
+            # Plot the sample image with its true and predicted labels
             plt.figure()
-            plt.imshow(random_images[i].numpy())
+            plt.imshow(sample_images[i])
+            plt.title(f"True: {true_label}, Pred: {predicted_label}")
 
-            # Append the image to the list with WandB caption
+            # Append the image to the list for logging
             wandb_images.append(wandb.Image(plt, caption=f"True: {true_label}, Pred: {predicted_label}"))
             plt.close()
 
-        # Log the images to WandB under the key 'predictions'
+        # Log the images to Weights & Biases
         wandb.log({"predictions": wandb_images}, step=epoch)

@@ -9,6 +9,7 @@ from trashnet.exception import TrashClassificationException
 from trashnet.components.model_trainer_components.utils.prepare_callbacks import CallbacksManager
 from trashnet.components.model_trainer_components.utils.display_info_dataset_batched import display_info_dataset_batched
 from trashnet.components.model_trainer_components.utils.save_history_training import save_history_training
+from trashnet.components.model_trainer_components.utils.check_device import check_device
 from trashnet.ml.model import build_model
 
 from trashnet.utils.main_utils import (display_log_message, 
@@ -130,6 +131,7 @@ class ModelTrainer:
             display_info_dataset_batched(config.batch_size, valid_tf_dataset_loaded, valid_tf_images_batched, kind='valid dataset')
 
             # Train model
+            check_device()
             display_log_message(f"Training model...")
             callbacks_manager = CallbacksManager(
                 log_file=self.model_trainer_config.training_table_file_path,

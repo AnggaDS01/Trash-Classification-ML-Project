@@ -44,6 +44,6 @@ WANDB:
         values: [1]
 
 HUGGINGFACE:
-  MODEL_FILE_PATH: best_model.keras
+  MODEL_FILE_PATH: trashnet_best_model.keras
   REPO_ID: Anggads01/trashnet-classifier
   COMMIT_MSG: "Upload best model in .keras format"
